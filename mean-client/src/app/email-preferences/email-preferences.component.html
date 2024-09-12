@@ -1,1 +1,16 @@
-<p>email-preferences works!</p>
+<h2>Email Preferences</h2>
+<form (ngSubmit)="onSubmit()">
+  <div>
+    <label>
+      <input type="checkbox" [(ngModel)]="newsletterOptIn" name="newsletterOptIn">
+      Receive newsletters
+    </label>
+  </div>
+  <div>
+    <label>
+      <input type="checkbox" [(ngModel)]="allEmailsOptIn" name="allEmailsOptIn">
+      Receive all emails
+    </label>
+  </div>
+  <button type="submit">Update Preferences</button>
+</form>
