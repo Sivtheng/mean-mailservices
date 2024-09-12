@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ProductService } from '../services/product.service'; 
 
 @Component({
   selector: 'app-product-list',
@@ -11,13 +12,21 @@ import { CommonModule } from '@angular/common';
 export class ProductListComponent implements OnInit {
   products: any[] = [];
 
+  constructor(private productService: ProductService) {}
+
   ngOnInit() {
-    // Fetch products from API
-    this.products = [
-      { id: 1, name: 'Product 1', price: 10 },
-      { id: 2, name: 'Product 2', price: 20 },
-      { id: 3, name: 'Product 3', price: 30 },
-    ];
+    this.loadProducts();
+  }
+
+  loadProducts() {
+    this.productService.getProducts().subscribe(
+      (data) => {
+        this.products = data;
+      },
+      (error) => {
+        console.error('Error fetching products:', error);
+      }
+    );
   }
 
   placeOrder(productId: number) {
