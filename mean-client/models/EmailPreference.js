@@ -3,9 +3,9 @@ const mongoose = require('mongoose');
 const emailPreferenceSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   newsletterOptIn: { type: Boolean, default: true },
-  allEmailsOptIn: { type: Boolean, default: true },
-}, { timestamps: true });
+  dailyUpdatesOptIn: { type: Boolean, default: false },
+  promotionalEmailsOptIn: { type: Boolean, default: true },
+  allEmailsOptIn: { type: Boolean, default: true }
+});
 
-const EmailPreference = mongoose.model('EmailPreference', emailPreferenceSchema);
-
-module.exports = EmailPreference;
+module.exports = mongoose.model('EmailPreference', emailPreferenceSchema);

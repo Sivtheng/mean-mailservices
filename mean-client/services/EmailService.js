@@ -4,7 +4,7 @@ const EmailPreference = require('../models/EmailPreference.js');
 
 class EmailService {
   static transporter = nodemailer.createTransport({
-    host: "smtp.mailtrap.io",
+    host: "smtp.sandbox.smtp.mailtrap.io",
     port: 2525,
     auth: {
       user: process.env.MAILTRAP_USER,
@@ -81,6 +81,44 @@ class EmailService {
       };
       await this.transporter.sendMail(mailOptions);
     }
+  }
+
+  static async testEmailSending() {
+    const mailOptions = {
+      from: '"E-commerce App" <noreply@ecommerce.com>',
+      to: 'test@example.com',
+      subject: 'Test Email',
+      html: '<p>This is a test email from the E-commerce App.</p>'
+    };
+
+    try {
+      const info = await this.transporter.sendMail(mailOptions);
+      console.log('Test email sent: ', info.messageId);
+      return info;
+    } catch (error) {
+      console.error('Error sending test email:', error);
+      throw error;
+    }
+  }
+
+  static async sendDailyUpdateEmail(user) {
+    const mailOptions = {
+      from: '"E-commerce App" <noreply@ecommerce.com>',
+      to: user.email,
+      subject: 'Daily Update',
+      html: `<p>Hello ${user.name}, here's your daily update from E-commerce App!</p>`
+    };
+    await this.transporter.sendMail(mailOptions);
+  }
+
+  static async sendMonthlyPromotionalEmail(user) {
+    const mailOptions = {
+      from: '"E-commerce App" <noreply@ecommerce.com>',
+      to: user.email,
+      subject: 'Monthly Promotions',
+      html: `<p>Hello ${user.name}, check out our exciting promotions for this month!</p>`
+    };
+    await this.transporter.sendMail(mailOptions);
   }
 }
 

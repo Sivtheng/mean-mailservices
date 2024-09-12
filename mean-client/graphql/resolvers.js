@@ -21,6 +21,6 @@ const resolvers = {
     createOrder: (_, args) => OrderService.createOrder(args),
     updateEmailPreference: (_, args) => EmailService.updateEmailPreference(args),
   },
-};
+}; 
 
 module.exports = resolvers;
