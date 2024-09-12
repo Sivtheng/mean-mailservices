@@ -1,0 +1,15 @@
+# Node modules
+node_modules/
+
+# Environment variables
+.env
+
+# Angular build output
+/mean-ecommerce-client/dist/
+
+# Logs
+*.log
+
+# IDE specific files
+.idea/
+.vscode/
