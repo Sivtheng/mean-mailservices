@@ -3,29 +3,22 @@ import { HttpLink } from 'apollo-angular/http';
 import { ApplicationConfig, inject } from '@angular/core';
 import { ApolloClientOptions, InMemoryCache } from '@apollo/client/core';
 
-const uri = 'http://localhost:3000/graphql'; // Updated GraphQL server URL
-export function apolloOptionsFactory(): ApolloClientOptions<any> {
-  const httpLink = inject(HttpLink);
+const uri = 'http://localhost:3000/graphql'; // <-- Ensure this matches your server URL
+
+export function createApollo(httpLink: HttpLink): ApolloClientOptions<any> {
   return {
     link: httpLink.create({ uri }),
     cache: new InMemoryCache(),
-    defaultOptions: {
-      watchQuery: {
-        fetchPolicy: 'network-only',
-        errorPolicy: 'ignore',
-      },
-      query: {
-        fetchPolicy: 'network-only',
-        errorPolicy: 'all',
-      },
-    },
   };
 }
 
-export const graphqlProvider: ApplicationConfig['providers'] = [
-  Apollo,
-  {
-    provide: APOLLO_OPTIONS,
-    useFactory: apolloOptionsFactory,
-  },
-];
+export function provideApollo(): ApplicationConfig['providers'] {
+  return [
+    Apollo,
+    {
+      provide: APOLLO_OPTIONS,
+      useFactory: createApollo,
+      deps: [HttpLink],
+    },
+  ];
+}

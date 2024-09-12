@@ -1,49 +1,55 @@
 const express = require('express');
-const { json } = require('express');
-const { connect } = require('mongoose');
+const http = require('http');
+const { ApolloServer } = require('@apollo/server');
+const { expressMiddleware } = require('@apollo/server/express4');
+const { ApolloServerPluginDrainHttpServer } = require('@apollo/server/plugin/drainHttpServer');
+const { json } = require('body-parser');
 const cors = require('cors');
-const { config } = require('dotenv');
-const { ApolloServer } = require('apollo-server-express');
+const mongoose = require('mongoose');
 const typeDefs = require('./mean-client/graphql/schema.js');
 const resolvers = require('./mean-client/graphql/resolvers.js');
-const CronService = require('./mean-client/services/CronService.js');
+const CronService = require('./mean-client/services/CronService');
 
-config();  // Load environment variables
-console.log('MONGO_URI:', process.env.MONGO_URI);
+require('dotenv').config({ path: '.env' });
 
 const app = express();
-
-// Middleware
-app.use(cors());
-app.use(json());  // Parse JSON bodies
+const httpServer = http.createServer(app);
 
 // Connect to MongoDB
-const mongoUri = process.env.MONGO_URI;
-console.log('Attempting to connect to:', mongoUri.replace(/\/\/.*@/, '//<credentials>@'));
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => console.log('Connected to MongoDB'))
+  .catch(err => console.error('MongoDB connection error:', err));
 
-connect(mongoUri)
-    .then(() => console.log('MongoDB connected'))
-    .catch(err => console.log('ERROR:', err.message));
-
-// Set up Apollo Server
-const server = new ApolloServer({
+async function startApolloServer() {
+  const server = new ApolloServer({
     typeDefs,
     resolvers,
-    context: ({ req }) => ({ req })
-});
+    plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
+  });
 
-async function startServer() {
-    await server.start();
-    server.applyMiddleware({ app });
+  await server.start();
+
+  app.use(
+    '/graphql',
+    cors(),
+    json(),
+    expressMiddleware(server, {
+      context: async ({ req }) => ({ req }),
+    }),
+  );
+
+  // Initialize cron jobs
+  CronService.initCronJobs();
+
+  const PORT = process.env.PORT || 3000;
+  await new Promise(resolve => httpServer.listen({ port: PORT }, resolve));
+  console.log(`🚀 Server ready at http://localhost:${PORT}/graphql`);
 }
 
-startServer();
+startApolloServer();
 
-// Initialize cron jobs
-CronService.initCronJobs();
-
-// Start the server
-const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}${server.graphqlPath}`);
+// Add logging middleware
+app.use((req, res, next) => {
+  console.log(`Received ${req.method} request to ${req.url}`);
+  next();
 });

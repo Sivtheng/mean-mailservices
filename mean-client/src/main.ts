@@ -1,6 +1,11 @@
 import { bootstrapApplication } from '@angular/platform-browser';
-import { appConfig } from './app/app.config';
 import { AppComponent } from './app/app.component';
+import { appConfig } from './app/app.config';
 
-bootstrapApplication(AppComponent, appConfig)
-  .catch((err) => console.error(err));
+// Disable SSL verification for local development
+(window as any).global = window;
+(window as any).process = {
+  env: { DEBUG: undefined },
+};
+
+bootstrapApplication(AppComponent, appConfig).catch(err => console.error(err));

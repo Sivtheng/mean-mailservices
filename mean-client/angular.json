@@ -34,7 +34,8 @@
             "prerender": true,
             "ssr": {
               "entry": "server.ts"
-            }
+            },
+            "allowedCommonJsDependencies": ["node-fetch"]
           },
           "configurations": {
             "production": {

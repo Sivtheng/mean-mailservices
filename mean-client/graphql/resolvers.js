@@ -1,26 +1,30 @@
-const User = require('../models/User');
-const Product = require('../models/Product');
-const Order = require('../models/Order');
-const EmailPreference = require('../models/EmailPreference');
-const AuthService = require('../services/AuthService');
-const ProductService = require('../services/ProductService');
-const OrderService = require('../services/OrderService');
-const EmailService = require('../services/EmailService');
+const products = []; // This is a temporary in-memory store. Replace with database in production.
 
 const resolvers = {
   Query: {
-    getUser: (_, { id }) => User.findById(id),
-    getProduct: (_, { id }) => Product.findById(id),
-    getOrders: (_, { userId }) => Order.find({ userId }),
-    getEmailPreference: (_, { userId }) => EmailPreference.findOne({ userId }),
+    getProducts: () => products,
+    getProduct: (_, { id }) => products.find(product => product.id === id),
   },
   Mutation: {
-    registerUser: (_, args) => AuthService.registerUser(args),
-    loginUser: (_, { email, password }) => AuthService.loginUser(email, password),
-    createProduct: (_, args) => ProductService.createProduct(args),
-    createOrder: (_, args) => OrderService.createOrder(args),
-    updateEmailPreference: (_, args) => EmailService.updateEmailPreference(args),
+    createProduct: (_, { name, description, price }) => {
+      const newProduct = { id: String(products.length + 1), name, description, price };
+      products.push(newProduct);
+      return newProduct;
+    },
+    updateProduct: (_, { id, name, description, price }) => {
+      const index = products.findIndex(product => product.id === id);
+      if (index === -1) return null;
+      const updatedProduct = { ...products[index], name, description, price };
+      products[index] = updatedProduct;
+      return updatedProduct;
+    },
+    deleteProduct: (_, { id }) => {
+      const index = products.findIndex(product => product.id === id);
+      if (index === -1) return false;
+      products.splice(index, 1);
+      return true;
+    },
   },
-}; 
+};
 
 module.exports = resolvers;
