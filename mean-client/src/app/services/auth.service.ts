@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
-import { Apollo, gql } from 'apollo-angular';
+import { Apollo } from 'apollo-angular';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import gql from 'graphql-tag';
+import { jwtDecode } from 'jwt-decode';
 
 @Injectable({
   providedIn: 'root'
@@ -53,9 +55,21 @@ export class AuthService {
   }
 
   isLoggedIn(): boolean {
-    if (typeof window !== 'undefined' && window.localStorage) {
-      return !!localStorage.getItem('token');
+    return !!localStorage.getItem('token');
+  }
+
+  getUserRole(): string {
+    const token = localStorage.getItem('token');
+    if (token) {
+      const decodedToken: any = jwtDecode(token);
+      return decodedToken.role;
     }
-    return false;
+    return '';
+  }
+
+  logout() {
+    localStorage.removeItem('token');
+    // You might want to clear Apollo cache here as well
+    this.apollo.client.resetStore();
   }
 }

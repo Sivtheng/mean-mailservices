@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { OrderService } from '../services/order.service';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-order-history',
@@ -10,13 +12,50 @@ import { CommonModule } from '@angular/common';
 })
 export class OrderHistoryComponent implements OnInit {
   orders: any[] = [];
+  userRole: string = '';
+
+  constructor(
+    private orderService: OrderService,
+    private authService: AuthService
+  ) {}
 
   ngOnInit() {
-    // Fetch orders from API
-    this.orders = [
-      { id: 1, productName: 'Product 1', quantity: 2, total: 20 },
-      { id: 2, productName: 'Product 2', quantity: 1, total: 20 },
-      { id: 3, productName: 'Product 3', quantity: 3, total: 90 },
-    ];
+    this.userRole = this.authService.getUserRole();
+    this.loadOrders();
+  }
+
+  loadOrders() {
+    if (this.userRole === 'buyer') {
+      this.orderService.getMyOrders().subscribe(
+        (data) => {
+          this.orders = data;
+        },
+        (error) => {
+          console.error('Error fetching orders:', error);
+        }
+      );
+    } else if (this.userRole === 'seller') {
+      this.orderService.getOrdersBySeller().subscribe(
+        (data) => {
+          this.orders = data;
+        },
+        (error) => {
+          console.error('Error fetching orders:', error);
+        }
+      );
+    }
+  }
+
+  updateOrderStatus(orderId: string, event: Event) {
+    const newStatus = (event.target as HTMLSelectElement).value;
+    this.orderService.updateOrderStatus(orderId, newStatus).subscribe({
+      next: (response) => {
+        console.log('Order status updated successfully', response);
+        this.loadOrders(); // Reload the order list
+      },
+      error: (error) => {
+        console.error('Error updating order status:', error);
+      }
+    });
   }
 }

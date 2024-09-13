@@ -26,6 +26,22 @@ export class ProductService {
     .valueChanges.pipe(map(result => result.data.getProducts));
   }
 
+  getMyProducts(): Observable<any[]> {
+    return this.apollo.watchQuery<any>({
+      query: gql`
+        query GetMyProducts {
+          getMyProducts {
+            id
+            name
+            description
+            price
+          }
+        }
+      `
+    })
+    .valueChanges.pipe(map(result => result.data.getMyProducts));
+  }
+
   createProduct(name: string, description: string, price: number): Observable<any> {
     return this.apollo.mutate({
       mutation: gql`
@@ -42,6 +58,19 @@ export class ProductService {
         name,
         description,
         price
+      }
+    });
+  }
+
+  deleteProduct(id: string): Observable<any> {
+    return this.apollo.mutate({
+      mutation: gql`
+        mutation DeleteProduct($id: ID!) {
+          deleteProduct(id: $id)
+        }
+      `,
+      variables: {
+        id
       }
     });
   }

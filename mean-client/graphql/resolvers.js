@@ -1,32 +1,87 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const Product = require('../models/Product');
+const Order = require('../models/Order');
 
-const products = []; // This is a temporary in-memory store. Replace with database in production.
+const authenticateUser = (context) => {
+  const authHeader = context.req.headers.authorization;
+  if (!authHeader) {
+    throw new Error('Authentication token is required');
+  }
+  const token = authHeader.split(' ')[1];
+  try {
+    const user = jwt.verify(token, process.env.JWT_SECRET);
+    return user;
+  } catch (error) {
+    throw new Error('Invalid/Expired token');
+  }
+};
 
 const resolvers = {
   Query: {
-    getProducts: () => products,
-    getProduct: (_, { id }) => products.find(product => product.id === id),
+    getProducts: async () => {
+      return await Product.find();
+    },
+    getProduct: async (_, { id }) => {
+      return await Product.findById(id);
+    },
+    getMyOrders: async (_, __, context) => {
+      const user = authenticateUser(context);
+      if (user.role !== 'buyer') {
+        throw new Error('Access denied. Buyers only.');
+      }
+      return await Order.find({ userId: user.userId });
+    },
+    getMyProducts: async (_, __, context) => {
+      const user = authenticateUser(context);
+      if (user.role !== 'seller') {
+        throw new Error('Access denied. Sellers only.');
+      }
+      return await Product.find({ sellerId: user.userId });
+    },
+    getOrdersBySeller: async (_, __, context) => {
+      const user = authenticateUser(context);
+      if (user.role !== 'seller') {
+        throw new Error('Access denied. Sellers only.');
+      }
+      const products = await Product.find({ sellerId: user.userId });
+      const productIds = products.map(product => product._id);
+      return await Order.find({ productId: { $in: productIds } });
+    },
   },
   Mutation: {
-    createProduct: (_, { name, description, price }) => {
-      const newProduct = { id: String(products.length + 1), name, description, price };
-      products.push(newProduct);
-      return newProduct;
+    createProduct: async (_, { name, description, price }, context) => {
+      const user = authenticateUser(context);
+      if (user.role !== 'seller') {
+        throw new Error('Access denied. Sellers only.');
+      }
+      const product = new Product({ name, description, price, sellerId: user.userId });
+      await product.save();
+      return product;
     },
-    updateProduct: (_, { id, name, description, price }) => {
-      const index = products.findIndex(product => product.id === id);
-      if (index === -1) return null;
-      const updatedProduct = { ...products[index], name, description, price };
-      products[index] = updatedProduct;
-      return updatedProduct;
+    updateProduct: async (_, { id, name, description, price }, context) => {
+      const user = authenticateUser(context);
+      if (user.role !== 'seller') {
+        throw new Error('Access denied. Sellers only.');
+      }
+      const product = await Product.findOneAndUpdate(
+        { _id: id, sellerId: user.userId },
+        { name, description, price },
+        { new: true }
+      );
+      if (!product) {
+        throw new Error('Product not found or you do not have permission to update it');
+      }
+      return product;
     },
-    deleteProduct: (_, { id }) => {
-      const index = products.findIndex(product => product.id === id);
-      if (index === -1) return false;
-      products.splice(index, 1);
-      return true;
+    deleteProduct: async (_, { id }, context) => {
+      const user = authenticateUser(context);
+      if (user.role !== 'seller') {
+        throw new Error('Access denied. Sellers only.');
+      }
+      const result = await Product.deleteOne({ _id: id, sellerId: user.userId });
+      return result.deletedCount > 0;
     },
     registerUser: async (_, { name, email, password, role }) => {
       try {
@@ -88,6 +143,32 @@ const resolvers = {
           token: null
         };
       }
+    },
+    placeOrder: async (_, { productId, quantity }, context) => {
+      const user = authenticateUser(context);
+      if (user.role !== 'buyer') {
+        throw new Error('Access denied. Buyers only.');
+      }
+      const order = new Order({ userId: user.userId, productId, quantity, status: 'pending' });
+      await order.save();
+      return order;
+    },
+    updateOrderStatus: async (_, { orderId, status }, context) => {
+      const user = authenticateUser(context);
+      if (user.role !== 'seller') {
+        throw new Error('Access denied. Sellers only.');
+      }
+      const order = await Order.findById(orderId);
+      if (!order) {
+        throw new Error('Order not found');
+      }
+      const product = await Product.findById(order.productId);
+      if (product.sellerId.toString() !== user.userId) {
+        throw new Error('Access denied. You can only update orders for your products.');
+      }
+      order.status = status;
+      await order.save();
+      return order;
     },
   },
 };

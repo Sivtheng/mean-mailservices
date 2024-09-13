@@ -6,11 +6,7 @@ const typeDefs = gql`
     name: String!
     description: String
     price: Float!
-  }
-
-  type Query {
-    getProducts: [Product]
-    getProduct(id: ID!): Product
+    sellerId: ID!
   }
 
   type User {
@@ -18,6 +14,22 @@ const typeDefs = gql`
     name: String!
     email: String!
     role: String!
+  }
+
+  type Query {
+    getProducts: [Product]
+    getProduct(id: ID!): Product
+    getMyOrders: [Order]
+    getMyProducts: [Product]
+    getOrdersBySeller: [Order]
+  }
+
+  type Order {
+    id: ID!
+    userId: ID!
+    productId: ID!
+    quantity: Int!
+    status: String!
   }
 
   type RegisterResponse {
@@ -38,6 +50,8 @@ const typeDefs = gql`
     deleteProduct(id: ID!): Boolean
     registerUser(name: String!, email: String!, password: String!, role: String!): RegisterResponse!
     loginUser(email: String!, password: String!): LoginResponse!
+    placeOrder(productId: ID!, quantity: Int!): Order
+    updateOrderStatus(orderId: ID!, status: String!): Order
   }
 `;
 

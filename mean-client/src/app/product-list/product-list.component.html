@@ -1,7 +1,16 @@
-<h2>Products</h2>
+<h2>{{ userRole === 'seller' ? 'My Products' : 'Products' }}</h2>
 <ul>
   <li *ngFor="let product of products">
     {{ product.name }} - ${{ product.price }}
-    <button (click)="placeOrder(product.id)">Order</button>
+    <ng-container *ngIf="userRole === 'buyer'">
+      <button (click)="placeOrder(product.id)">Order</button>
+    </ng-container>
+    <ng-container *ngIf="userRole === 'seller'">
+      <button (click)="deleteProduct(product.id)">Delete</button>
+      <a [routerLink]="['/edit-product', product.id]">Edit</a>
+    </ng-container>
   </li>
 </ul>
+<ng-container *ngIf="userRole === 'seller'">
+  <a routerLink="/create-product">Add New Product</a>
+</ng-container>
