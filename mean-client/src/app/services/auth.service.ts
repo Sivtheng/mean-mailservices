@@ -55,21 +55,28 @@ export class AuthService {
   }
 
   isLoggedIn(): boolean {
-    return !!localStorage.getItem('token');
+    if (typeof window !== 'undefined') {
+      return !!localStorage.getItem('token');
+    }
+    return false;
   }
 
   getUserRole(): string {
-    const token = localStorage.getItem('token');
-    if (token) {
-      const decodedToken: any = jwtDecode(token);
-      return decodedToken.role;
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('token');
+      if (token) {
+        const decodedToken: any = jwtDecode(token);
+        return decodedToken.role;
+      }
     }
     return '';
   }
 
   logout() {
-    localStorage.removeItem('token');
-    // You might want to clear Apollo cache here as well
-    this.apollo.client.resetStore();
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('token');
+      // You might want to clear Apollo cache here as well
+      this.apollo.client.resetStore();
+    }
   }
 }
