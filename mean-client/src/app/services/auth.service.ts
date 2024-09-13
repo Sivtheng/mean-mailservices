@@ -56,7 +56,9 @@ export class AuthService {
 
   isLoggedIn(): boolean {
     if (typeof window !== 'undefined') {
-      return !!localStorage.getItem('token');
+      const isLoggedIn = !!localStorage.getItem('token');
+      console.log('isLoggedIn:', isLoggedIn);
+      return isLoggedIn;
     }
     return false;
   }
@@ -65,17 +67,28 @@ export class AuthService {
     if (typeof window !== 'undefined') {
       const token = localStorage.getItem('token');
       if (token) {
-        const decodedToken: any = jwtDecode(token);
-        return decodedToken.role;
+        try {
+          const decodedToken: any = jwtDecode(token);
+          console.log('Decoded token:', decodedToken);
+          if (decodedToken && typeof decodedToken === 'object') {
+            console.log('User role from token:', decodedToken.role);
+            return decodedToken.role || '';
+          }
+        } catch (error) {
+          console.error('Error decoding token:', error);
+        }
       }
     }
+    console.log('No token found or unable to decode');
     return '';
   }
 
   logout() {
     if (typeof window !== 'undefined') {
-      localStorage.removeItem('token');
-      // You might want to clear Apollo cache here as well
+      localStorage.clear(); // This will remove all items from local storage
+      // If you want to remove only specific items, you can use:
+      // localStorage.removeItem('token');
+      // localStorage.removeItem('user');
       this.apollo.client.resetStore();
     }
   }

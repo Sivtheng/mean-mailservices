@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { RouterOutlet, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from './services/auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-root',
@@ -26,6 +27,9 @@ import { AuthService } from './services/auth.service';
           <li *ngIf="authService.isLoggedIn()"><a (click)="logout()" class="text-blue-500 hover:text-blue-700 cursor-pointer">Logout</a></li>
         </ul>
       </nav>
+      <div *ngIf="authService.isLoggedIn()" class="mb-4 text-lg font-bold">
+        Welcome {{ authService.getUserRole() === 'seller' ? 'Seller' : 'Buyer' }}!
+      </div>
       <router-outlet></router-outlet>
     </div>
   `,
@@ -36,10 +40,26 @@ import { AuthService } from './services/auth.service';
   `]
 })
 export class AppComponent {
-  constructor(public authService: AuthService) {}
+  welcomeMessage: string = '';
+
+  constructor(public authService: AuthService, private router: Router) {
+    this.setWelcomeMessage();
+  }
 
   logout() {
     this.authService.logout();
-    // Redirect to home page or login page after logout
+    this.setWelcomeMessage();
+    this.router.navigate(['/']); // Navigate to home page after logout
+  }
+
+  private setWelcomeMessage() {
+    if (this.authService.isLoggedIn()) {
+      const role = this.authService.getUserRole();
+      console.log('User role from AuthService:', role);
+      this.welcomeMessage = `Welcome ${role}!`;
+    } else {
+      this.welcomeMessage = '';
+    }
+    console.log('Welcome message set to:', this.welcomeMessage);
   }
 }
