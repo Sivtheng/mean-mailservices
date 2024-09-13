@@ -19,8 +19,8 @@ export class LoginComponent {
   constructor(private authService: AuthService, private router: Router) {}
 
   onSubmit() {
-    this.authService.login(this.email, this.password).subscribe(
-      (response) => {
+    this.authService.login(this.email, this.password).subscribe({
+      next: (response) => {
         if (response.success) {
           localStorage.setItem('token', response.token!);
           this.router.navigate(['/products']);
@@ -28,10 +28,10 @@ export class LoginComponent {
           this.errorMessage = response.message;
         }
       },
-      (error) => {
+      error: (error) => {
         console.error('Login error:', error);
         this.errorMessage = 'An unexpected error occurred. Please try again.';
       }
-    );
+    });
   }
 }

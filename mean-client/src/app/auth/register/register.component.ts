@@ -24,8 +24,8 @@ export class RegisterComponent {
   constructor(private authService: AuthService, private router: Router) {}
 
   onSubmit() {
-    this.authService.register(this.name, this.email, this.password, this.role).subscribe(
-      (response) => {
+    this.authService.register(this.name, this.email, this.password, this.role).subscribe({
+      next: (response) => {
         if (response.success) {
           console.log('User registered:', response.user);
           this.router.navigate(['/login']);
@@ -33,10 +33,10 @@ export class RegisterComponent {
           this.errorMessage = response.message;
         }
       },
-      (error) => {
+      error: (error) => {
         console.error('Registration error:', error);
         this.errorMessage = 'An unexpected error occurred. Please try again.';
       }
-    );
+    });
   }
 }

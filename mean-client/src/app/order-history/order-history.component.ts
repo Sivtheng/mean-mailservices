@@ -26,23 +26,23 @@ export class OrderHistoryComponent implements OnInit {
 
   loadOrders() {
     if (this.userRole === 'buyer') {
-      this.orderService.getMyOrders().subscribe(
-        (data) => {
+      this.orderService.getMyOrders().subscribe({
+        next: (data) => {
           this.orders = data;
         },
-        (error) => {
+        error: (error) => {
           console.error('Error fetching orders:', error);
         }
-      );
+      });
     } else if (this.userRole === 'seller') {
-      this.orderService.getOrdersBySeller().subscribe(
-        (data) => {
+      this.orderService.getOrdersBySeller().subscribe({
+        next: (data) => {
           this.orders = data;
         },
-        (error) => {
+        error: (error) => {
           console.error('Error fetching orders:', error);
         }
-      );
+      });
     }
   }
 
