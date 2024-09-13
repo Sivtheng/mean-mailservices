@@ -41,9 +41,10 @@ async function startApolloServer() {
   // Initialize cron jobs
   CronService.initCronJobs();
 
-  const PORT = process.env.PORT || 3000;
+  const PORT = process.env.GRAPHQL_PORT || 3000; // Use GRAPHQL_PORT if set, otherwise 3000
   await new Promise(resolve => httpServer.listen({ port: PORT }, resolve));
   console.log(`🚀 Server ready at http://localhost:${PORT}/graphql`);
+  console.log(`Using PORT: ${PORT}`);
 }
 
 startApolloServer();
