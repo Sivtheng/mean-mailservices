@@ -15,19 +15,27 @@ export class RegisterComponent {
   name: string = '';
   email: string = '';
   password: string = '';
-  role: string = 'user';
+  role: string = 'buyer'; // Default role
+  errorMessage: string = '';
+  
+  // Add this property to define the available roles
+  roles: string[] = ['buyer', 'seller'];
 
   constructor(private authService: AuthService, private router: Router) {}
 
   onSubmit() {
     this.authService.register(this.name, this.email, this.password, this.role).subscribe(
-      (user) => {
-        console.log('User registered:', user);
-        this.router.navigate(['/login']);
+      (response) => {
+        if (response.success) {
+          console.log('User registered:', response.user);
+          this.router.navigate(['/login']);
+        } else {
+          this.errorMessage = response.message;
+        }
       },
       (error) => {
         console.error('Registration error:', error);
-        // Handle registration error (show message to user)
+        this.errorMessage = 'An unexpected error occurred. Please try again.';
       }
     );
   }

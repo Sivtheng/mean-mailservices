@@ -14,18 +14,23 @@ import { Router } from '@angular/router';
 export class LoginComponent {
   email: string = '';
   password: string = '';
+  errorMessage: string = '';
 
   constructor(private authService: AuthService, private router: Router) {}
 
   onSubmit() {
     this.authService.login(this.email, this.password).subscribe(
-      (token) => {
-        localStorage.setItem('token', token);
-        this.router.navigate(['/products']);
+      (response) => {
+        if (response.success) {
+          localStorage.setItem('token', response.token!);
+          this.router.navigate(['/products']);
+        } else {
+          this.errorMessage = response.message;
+        }
       },
       (error) => {
         console.error('Login error:', error);
-        // Handle login error (show message to user)
+        this.errorMessage = 'An unexpected error occurred. Please try again.';
       }
     );
   }
