@@ -9,8 +9,7 @@ import { OrderService } from '../services/order.service';
   selector: 'app-product-list',
   standalone: true,
   imports: [CommonModule, RouterModule],
-  templateUrl: './product-list.component.html',
-  styleUrls: ['./product-list.component.css']
+  templateUrl: './product-list.component.html'
 })
 export class ProductListComponent implements OnInit {
   products: any[] = [];

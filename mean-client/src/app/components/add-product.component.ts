@@ -8,8 +8,7 @@ import { Router } from '@angular/router';
   selector: 'app-add-product',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './add-product.component.html',
-  styles: []
+  templateUrl: './add-product.component.html'
 })
 export class AddProductComponent {
   product = {

@@ -6,8 +6,7 @@ import { FormsModule } from '@angular/forms';
   selector: 'app-email-preferences',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './email-preferences.component.html',
-  styleUrls: ['./email-preferences.component.css']
+  templateUrl: './email-preferences.component.html'
 })
 export class EmailPreferencesComponent {
   newsletterOptIn: boolean = true;

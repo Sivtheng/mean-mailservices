@@ -10,6 +10,7 @@
         <li *ngIf="authService.getUserRole() === 'seller'">
           <a routerLink="/add-product" class="text-blue-500 hover:text-blue-700">Add Product</a>
         </li>
+        <li><a routerLink="/email-preferences" class="text-blue-500 hover:text-blue-700">Email Preferences</a></li>
       </ng-container>
       <li *ngIf="!authService.isLoggedIn()"><a routerLink="/login" class="text-blue-500 hover:text-blue-700">Login</a></li>
       <li *ngIf="!authService.isLoggedIn()"><a routerLink="/register" class="text-blue-500 hover:text-blue-700">Register</a></li>

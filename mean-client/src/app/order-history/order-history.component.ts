@@ -7,8 +7,7 @@ import { AuthService } from '../services/auth.service';
   selector: 'app-order-history',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './order-history.component.html',
-  styleUrls: ['./order-history.component.css']
+  templateUrl: './order-history.component.html'
 })
 export class OrderHistoryComponent implements OnInit {
   orders: any[] = [];
