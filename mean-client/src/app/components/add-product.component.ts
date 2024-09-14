@@ -20,6 +20,7 @@ export class AddProductComponent {
   constructor(private productService: ProductService, private router: Router) {}
 
   onSubmit() {
+    console.log('Submitting product:', this.product);
     this.productService.createProduct(this.product.name, this.product.description, this.product.price).subscribe({
       next: (response) => {
         console.log('Product added successfully', response);
@@ -27,6 +28,8 @@ export class AddProductComponent {
       },
       error: (error) => {
         console.error('Error adding product:', error);
+        // Display error message to user
+        alert('Error adding product: ' + error.message);
       }
     });
   }
