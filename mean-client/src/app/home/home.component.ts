@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-home',
@@ -9,7 +10,7 @@ import { RouterModule } from '@angular/router';
   template: `
     <div class="container mx-auto p-4">
       <h1 class="text-3xl font-bold mb-4">Welcome to our E-commerce App</h1>
-      <div class="flex space-x-4">
+      <div class="flex space-x-4" *ngIf="!authService.isLoggedIn()">
         <a routerLink="/login" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
           Login
         </a>
@@ -21,4 +22,6 @@ import { RouterModule } from '@angular/router';
   `,
   styles: []
 })
-export class HomeComponent { }
+export class HomeComponent {
+  constructor(public authService: AuthService) {}
+}

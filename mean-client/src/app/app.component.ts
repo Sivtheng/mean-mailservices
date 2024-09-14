@@ -8,31 +8,7 @@ import { Router } from '@angular/router';
   selector: 'app-root',
   standalone: true,
   imports: [RouterOutlet, RouterLink, CommonModule],
-  template: `
-    <div class="container mx-auto p-4">
-      <nav class="mb-4">
-        <ul class="flex space-x-4">
-          <li><a routerLink="/" class="text-blue-500 hover:text-blue-700">Home</a></li>
-          <ng-container *ngIf="authService.isLoggedIn()">
-            <li><a routerLink="/products" class="text-blue-500 hover:text-blue-700">Products</a></li>
-            <li><a routerLink="/order-history" class="text-blue-500 hover:text-blue-700">
-              {{ authService.getUserRole() === 'seller' ? 'Manage Orders' : 'Order History' }}
-            </a></li>
-            <li *ngIf="authService.getUserRole() === 'seller'">
-              <a routerLink="/create-product" class="text-blue-500 hover:text-blue-700">Add Product</a>
-            </li>
-          </ng-container>
-          <li *ngIf="!authService.isLoggedIn()"><a routerLink="/login" class="text-blue-500 hover:text-blue-700">Login</a></li>
-          <li *ngIf="!authService.isLoggedIn()"><a routerLink="/register" class="text-blue-500 hover:text-blue-700">Register</a></li>
-          <li *ngIf="authService.isLoggedIn()"><a (click)="logout()" class="text-blue-500 hover:text-blue-700 cursor-pointer">Logout</a></li>
-        </ul>
-      </nav>
-      <div *ngIf="authService.isLoggedIn()" class="mb-4 text-lg font-bold">
-        Welcome {{ authService.getUserRole() === 'seller' ? 'Seller' : 'Buyer' }}!
-      </div>
-      <router-outlet></router-outlet>
-    </div>
-  `,
+  templateUrl: './app.component.html',
   styles: [`
     :host {
       @apply bg-gray-100 min-h-screen;
