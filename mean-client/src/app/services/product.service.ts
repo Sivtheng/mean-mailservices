@@ -75,6 +75,7 @@ export class ProductService {
   }
 
   deleteProduct(id: string): Observable<any> {
+    const token = localStorage.getItem('token');
     return this.apollo.mutate({
       mutation: gql`
         mutation DeleteProduct($id: ID!) {
@@ -83,6 +84,9 @@ export class ProductService {
       `,
       variables: {
         id
+      },
+      context: {
+        headers: new HttpHeaders().set('Authorization', `Bearer ${token}`)
       }
     });
   }

@@ -73,6 +73,7 @@ export class ProductListComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error deleting product:', error);
+        this.errorMessage = 'Failed to delete product. Please try again.';
       }
     });
   }
