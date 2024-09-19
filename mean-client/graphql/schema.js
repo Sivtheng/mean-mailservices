@@ -28,7 +28,8 @@ const typeDefs = gql`
     id: ID!
     userId: ID!
     productId: ID!
-    quantity: Int!
+    productName: String!
+    productPrice: Float!
     status: String!
   }
 
@@ -50,7 +51,7 @@ const typeDefs = gql`
     deleteProduct(id: ID!): Boolean
     registerUser(name: String!, email: String!, password: String!, role: String!): RegisterResponse!
     loginUser(email: String!, password: String!): LoginResponse!
-    placeOrder(productId: ID!, quantity: Int!): Order
+    placeOrder(productId: ID!): Order
     updateOrderStatus(orderId: ID!, status: String!): Order
     confirmOrder(orderId: ID!): Order
     rejectOrder(orderId: ID!): Order

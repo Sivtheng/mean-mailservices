@@ -65,18 +65,27 @@ export class ProductListComponent implements OnInit {
   }
 
   confirmOrder(productId: string) {
-    this.orderService.placeOrder(productId, 1).subscribe({
+    this.orderService.placeOrder(productId).subscribe({
       next: (response) => {
         console.log('Order placed successfully', response);
-        this.showOrderConfirmation = false;
         this.showSuccessMessage = true;
         this.successMessage = 'Order placed successfully!';
         setTimeout(() => {
           this.showSuccessMessage = false;
         }, 3000);
+        this.showOrderConfirmation = false;
       },
       error: (error) => {
         console.error('Error placing order:', error);
+        console.error('Error type:', error.constructor.name);
+        console.error('Error message:', error.message);
+        console.error('Error stack:', error.stack);
+        if (error.graphQLErrors) {
+          console.error('GraphQL Errors:', error.graphQLErrors);
+        }
+        if (error.networkError) {
+          console.error('Network Error:', error.networkError);
+        }
         if (error.message.includes('Authentication token is required')) {
           this.showErrorMessage('You need to be logged in to place an order. Please log in and try again.');
         } else {

@@ -19,7 +19,8 @@ export class OrderService {
           getMyOrders {
             id
             productId
-            quantity
+            productName
+            productPrice
             status
           }
         }
@@ -39,7 +40,8 @@ export class OrderService {
           getOrdersBySeller {
             id
             productId
-            quantity
+            productName
+            productPrice
             status
           }
         }
@@ -51,26 +53,41 @@ export class OrderService {
     .valueChanges.pipe(map(result => result.data.getOrdersBySeller));
   }
 
-  placeOrder(productId: string, quantity: number): Observable<any> {
+  placeOrder(productId: string): Observable<any> {
     const token = localStorage.getItem('token');
     return this.apollo.mutate({
       mutation: gql`
-        mutation PlaceOrder($productId: ID!, $quantity: Int!) {
-          placeOrder(productId: $productId, quantity: $quantity) {
+        mutation PlaceOrder($productId: ID!) {
+          placeOrder(productId: $productId) {
             id
             productId
-            quantity
+            productName
+            productPrice
             status
           }
         }
       `,
       variables: {
-        productId,
-        quantity
+        productId
       },
       context: {
         headers: new HttpHeaders().set('Authorization', `Bearer ${token}`)
-      }
+      },
+      refetchQueries: [
+        {
+          query: gql`
+            query GetMyOrders {
+              getMyOrders {
+                id
+                productId
+                productName
+                productPrice
+                status
+              }
+            }
+          `
+        }
+      ]
     });
   }
 

@@ -146,14 +146,29 @@ const resolvers = {
         };
       }
     },
-    placeOrder: async (_, { productId, quantity }, context) => {
-      const user = authenticateUser(context);
-      if (user.role !== 'buyer') {
-        throw new Error('Access denied. Buyers only.');
+    placeOrder: async (_, { productId }, context) => {
+      try {
+        const user = authenticateUser(context);
+        if (user.role !== 'buyer') {
+          throw new Error('Access denied. Buyers only.');
+        }
+        const product = await Product.findById(productId);
+        if (!product) {
+          throw new Error('Product not found');
+        }
+        const order = new Order({
+          userId: user.userId,
+          productId: product._id,
+          productName: product.name,
+          productPrice: product.price,
+          status: 'pending'
+        });
+        await order.save();
+        return order;
+      } catch (error) {
+        console.error('Server-side error in placeOrder:', error);
+        throw error;
       }
-      const order = new Order({ userId: user.userId, productId, quantity, status: 'pending' });
-      await order.save();
-      return order;
     },
     updateOrderStatus: async (_, { orderId, status }, context) => {
       const user = authenticateUser(context);
