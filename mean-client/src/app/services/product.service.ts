@@ -12,6 +12,7 @@ export class ProductService {
   constructor(private apollo: Apollo) {}
 
   getProducts(): Observable<any[]> {
+    const token = localStorage.getItem('token');
     return this.apollo.watchQuery<any>({
       query: gql`
         query GetProducts {
@@ -22,12 +23,16 @@ export class ProductService {
             price
           }
         }
-      `
+      `,
+      context: {
+        headers: new HttpHeaders().set('Authorization', `Bearer ${token}`)
+      }
     })
     .valueChanges.pipe(map(result => result.data.getProducts));
   }
 
   getMyProducts(): Observable<any[]> {
+    const token = localStorage.getItem('token');
     return this.apollo.watchQuery<any>({
       query: gql`
         query GetMyProducts {
@@ -38,7 +43,10 @@ export class ProductService {
             price
           }
         }
-      `
+      `,
+      context: {
+        headers: new HttpHeaders().set('Authorization', `Bearer ${token}`)
+      }
     })
     .valueChanges.pipe(map(result => result.data.getMyProducts));
   }

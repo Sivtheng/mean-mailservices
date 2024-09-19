@@ -14,6 +14,7 @@ import { OrderService } from '../services/order.service';
 export class ProductListComponent implements OnInit {
   products: any[] = [];
   userRole: string = '';
+  errorMessage: string = '';
 
   constructor(
     private productService: ProductService,
@@ -27,6 +28,7 @@ export class ProductListComponent implements OnInit {
   }
 
   loadProducts() {
+    this.errorMessage = '';
     if (this.userRole === 'seller') {
       this.productService.getMyProducts().subscribe({
         next: (data) => {
@@ -34,6 +36,7 @@ export class ProductListComponent implements OnInit {
         },
         error: (error) => {
           console.error('Error fetching products:', error);
+          this.errorMessage = 'Unable to load products. Please try logging in again.';
         }
       });
     } else {
@@ -43,6 +46,7 @@ export class ProductListComponent implements OnInit {
         },
         error: (error) => {
           console.error('Error fetching products:', error);
+          this.errorMessage = 'Unable to load products. Please try logging in again.';
         }
       });
     }

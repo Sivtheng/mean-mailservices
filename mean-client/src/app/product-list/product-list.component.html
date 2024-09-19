@@ -2,7 +2,10 @@
   <a routerLink="/add-product" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-4 inline-block">Add New Product</a>
 </ng-container>
 <h2 class="pt-6">{{ userRole === 'seller' ? 'My Products' : 'Products' }}</h2>
-<ul>
+<div *ngIf="errorMessage" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+  {{ errorMessage }}
+</div>
+<ul *ngIf="!errorMessage">
   <li *ngFor="let product of products">
     {{ product.name }} - ${{ product.price }}
     <ng-container *ngIf="userRole === 'buyer'">
