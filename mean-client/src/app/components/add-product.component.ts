@@ -24,7 +24,9 @@ export class AddProductComponent {
     this.productService.createProduct(this.product.name, this.product.description, this.product.price).subscribe({
       next: (response) => {
         console.log('Product added successfully', response);
-        this.router.navigate(['/products']);
+        this.router.navigate(['/products']).then(() => {
+          window.location.reload();
+        });
       },
       error: (error) => {
         console.error('Error adding product:', error);

@@ -4,6 +4,7 @@ import { RouterModule } from '@angular/router';
 import { ProductService } from '../services/product.service';
 import { AuthService } from '../services/auth.service';
 import { OrderService } from '../services/order.service';
+import { Router } from '@angular/router'; // Add Router import
 
 @Component({
   selector: 'app-product-list',
@@ -19,7 +20,8 @@ export class ProductListComponent implements OnInit {
   constructor(
     private productService: ProductService,
     private authService: AuthService,
-    private orderService: OrderService
+    private orderService: OrderService,
+    private router: Router // Add Router to the constructor
   ) {}
 
   ngOnInit() {
@@ -69,11 +71,15 @@ export class ProductListComponent implements OnInit {
     this.productService.deleteProduct(productId).subscribe({
       next: (response) => {
         console.log('Product deleted successfully', response);
-        this.loadProducts(); // Reload the product list
+        // Force page reload after successful deletion
+        this.router.navigateByUrl('/products', { skipLocationChange: true }).then(() => {
+          window.location.reload();
+        });
       },
       error: (error) => {
         console.error('Error deleting product:', error);
-        this.errorMessage = 'Failed to delete product. Please try again.';
+        // You might want to show an error message to the user
+        alert('Error deleting product: ' + error.message);
       }
     });
   }
