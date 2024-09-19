@@ -1,5 +1,6 @@
 <h2>{{ userRole === 'seller' ? 'Orders for My Products' : 'My Orders' }}</h2>
-<table>
+<div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
+<table *ngIf="!errorMessage">
   <thead>
     <tr>
       <th>Order ID</th>

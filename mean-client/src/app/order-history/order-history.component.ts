@@ -12,6 +12,7 @@ import { AuthService } from '../services/auth.service';
 export class OrderHistoryComponent implements OnInit {
   orders: any[] = [];
   userRole: string = '';
+  errorMessage: string = '';
 
   constructor(
     private orderService: OrderService,
@@ -24,6 +25,7 @@ export class OrderHistoryComponent implements OnInit {
   }
 
   loadOrders() {
+    this.errorMessage = ''; // Clear any previous error messages
     if (this.userRole === 'buyer') {
       this.orderService.getMyOrders().subscribe({
         next: (data) => {
@@ -31,6 +33,7 @@ export class OrderHistoryComponent implements OnInit {
         },
         error: (error) => {
           console.error('Error fetching orders:', error);
+          this.errorMessage = 'Unable to load orders. Please try logging in again.';
         }
       });
     } else if (this.userRole === 'seller') {
@@ -40,6 +43,7 @@ export class OrderHistoryComponent implements OnInit {
         },
         error: (error) => {
           console.error('Error fetching orders:', error);
+          this.errorMessage = 'Unable to load orders. Please try logging in again.';
         }
       });
     }

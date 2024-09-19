@@ -3,6 +3,7 @@ import { Apollo } from 'apollo-angular';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import gql from 'graphql-tag';
+import { HttpHeaders } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
@@ -11,6 +12,7 @@ export class OrderService {
   constructor(private apollo: Apollo) {}
 
   getMyOrders(): Observable<any[]> {
+    const token = localStorage.getItem('token');
     return this.apollo.watchQuery<any>({
       query: gql`
         query GetMyOrders {
@@ -21,12 +23,16 @@ export class OrderService {
             status
           }
         }
-      `
+      `,
+      context: {
+        headers: new HttpHeaders().set('Authorization', `Bearer ${token}`)
+      }
     })
     .valueChanges.pipe(map(result => result.data.getMyOrders));
   }
 
   getOrdersBySeller(): Observable<any[]> {
+    const token = localStorage.getItem('token');
     return this.apollo.watchQuery<any>({
       query: gql`
         query GetOrdersBySeller {
@@ -37,7 +43,10 @@ export class OrderService {
             status
           }
         }
-      `
+      `,
+      context: {
+        headers: new HttpHeaders().set('Authorization', `Bearer ${token}`)
+      }
     })
     .valueChanges.pipe(map(result => result.data.getOrdersBySeller));
   }
