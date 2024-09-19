@@ -1,16 +1,20 @@
 import { Injectable } from '@angular/core';
 import { Apollo } from 'apollo-angular';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, tap } from 'rxjs/operators';
 import gql from 'graphql-tag';
 import { jwtDecode } from 'jwt-decode';
 import { LoggerService } from './logger.service';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  constructor(private apollo: Apollo, private logger: LoggerService) {}
+  private sessionTimer: any;
+  private readonly SESSION_DURATION = 3600000; // 1 hour in milliseconds
+
+  constructor(private apollo: Apollo, private logger: LoggerService, private router: Router) {}
 
   login(email: string, password: string): Observable<{ success: boolean; message: string; token: string | null }> {
     return this.apollo.mutate({
@@ -27,7 +31,15 @@ export class AuthService {
         email,
         password
       }
-    }).pipe(map((result: any) => result.data.loginUser));
+    }).pipe(
+      map((result: any) => result.data.loginUser),
+      tap((response) => {
+        if (response.success) {
+          localStorage.setItem('token', response.token!);
+          this.startSessionTimer();
+        }
+      })
+    );
   }
 
   register(name: string, email: string, password: string, role: string): Observable<{ success: boolean; message: string; user: any | null }> {
@@ -84,10 +96,29 @@ export class AuthService {
     return '';
   }
 
+  startSessionTimer() {
+    this.clearSessionTimer();
+    this.sessionTimer = setTimeout(() => {
+      this.logout();
+      this.router.navigate(['/login']);
+    }, this.SESSION_DURATION);
+  }
+
+  clearSessionTimer() {
+    if (this.sessionTimer) {
+      clearTimeout(this.sessionTimer);
+    }
+  }
+
+  refreshSession() {
+    this.startSessionTimer();
+  }
+
   logout() {
     if (typeof window !== 'undefined') {
       localStorage.clear();
       this.apollo.client.resetStore();
+      this.clearSessionTimer();
       this.logger.info('User logged out');
     }
   }

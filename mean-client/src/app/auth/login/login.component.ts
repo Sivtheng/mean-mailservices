@@ -21,7 +21,7 @@ export class LoginComponent {
     this.authService.login(this.email, this.password).subscribe({
       next: (response) => {
         if (response.success) {
-          localStorage.setItem('token', response.token!);
+          this.authService.startSessionTimer();
           this.router.navigate(['/products']);
         } else {
           this.errorMessage = response.message;

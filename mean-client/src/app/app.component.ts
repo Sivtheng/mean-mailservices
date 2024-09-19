@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 import { RouterOutlet, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from './services/auth.service';
@@ -26,6 +26,14 @@ export class AppComponent {
   ) {
     this.setWelcomeMessage();
     this.logger.setLevel(LogLevel.Info); // Set the desired log level
+  }
+
+  @HostListener('window:mousemove')
+  @HostListener('window:keypress')
+  refreshUserSession() {
+    if (this.authService.isLoggedIn()) {
+      this.authService.refreshSession();
+    }
   }
 
   logout() {
