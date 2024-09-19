@@ -172,6 +172,40 @@ const resolvers = {
       await order.save();
       return order;
     },
+    confirmOrder: async (_, { orderId }, context) => {
+      const user = authenticateUser(context);
+      if (user.role !== 'seller') {
+        throw new Error('Access denied. Sellers only.');
+      }
+      const order = await Order.findById(orderId);
+      if (!order) {
+        throw new Error('Order not found');
+      }
+      const product = await Product.findById(order.productId);
+      if (product.sellerId.toString() !== user.userId) {
+        throw new Error('Access denied. You can only confirm orders for your products.');
+      }
+      order.status = 'confirmed';
+      await order.save();
+      return order;
+    },
+    rejectOrder: async (_, { orderId }, context) => {
+      const user = authenticateUser(context);
+      if (user.role !== 'seller') {
+        throw new Error('Access denied. Sellers only.');
+      }
+      const order = await Order.findById(orderId);
+      if (!order) {
+        throw new Error('Order not found');
+      }
+      const product = await Product.findById(order.productId);
+      if (product.sellerId.toString() !== user.userId) {
+        throw new Error('Access denied. You can only reject orders for your products.');
+      }
+      order.status = 'rejected';
+      await order.save();
+      return order;
+    },
   },
 };
 

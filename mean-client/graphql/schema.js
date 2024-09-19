@@ -52,6 +52,8 @@ const typeDefs = gql`
     loginUser(email: String!, password: String!): LoginResponse!
     placeOrder(productId: ID!, quantity: Int!): Order
     updateOrderStatus(orderId: ID!, status: String!): Order
+    confirmOrder(orderId: ID!): Order
+    rejectOrder(orderId: ID!): Order
   }
 `;
 

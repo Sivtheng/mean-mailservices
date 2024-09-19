@@ -4,24 +4,29 @@ import { RouterModule } from '@angular/router';
 import { ProductService } from '../services/product.service';
 import { AuthService } from '../services/auth.service';
 import { OrderService } from '../services/order.service';
-import { Router } from '@angular/router'; // Add Router import
+import { Router } from '@angular/router';
+import { OrderConfirmationComponent } from '../components/order-confirmation.component';
 
 @Component({
   selector: 'app-product-list',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, OrderConfirmationComponent],
   templateUrl: './product-list.component.html'
 })
 export class ProductListComponent implements OnInit {
   products: any[] = [];
   userRole: string = '';
   errorMessage: string = '';
+  showOrderConfirmation: boolean = false;
+  selectedProductId: string = '';
+  showSuccessMessage: boolean = false;
+  successMessage: string = '';
 
   constructor(
     private productService: ProductService,
     private authService: AuthService,
     private orderService: OrderService,
-    private router: Router // Add Router to the constructor
+    private router: Router
   ) {}
 
   ngOnInit() {
@@ -54,17 +59,42 @@ export class ProductListComponent implements OnInit {
     }
   }
 
-  placeOrder(productId: string) {
+  initiateOrder(productId: string) {
+    this.selectedProductId = productId;
+    this.showOrderConfirmation = true;
+  }
+
+  confirmOrder(productId: string) {
     this.orderService.placeOrder(productId, 1).subscribe({
       next: (response) => {
         console.log('Order placed successfully', response);
-        // You might want to show a success message to the user
+        this.showOrderConfirmation = false;
+        this.showSuccessMessage = true;
+        this.successMessage = 'Order placed successfully!';
+        setTimeout(() => {
+          this.showSuccessMessage = false;
+        }, 3000);
       },
       error: (error) => {
         console.error('Error placing order:', error);
-        // You might want to show an error message to the user
+        if (error.message.includes('Authentication token is required')) {
+          this.showErrorMessage('You need to be logged in to place an order. Please log in and try again.');
+        } else {
+          this.showErrorMessage('Error placing order: ' + error.message);
+        }
       }
     });
+  }
+
+  showErrorMessage(message: string) {
+    this.errorMessage = message;
+    setTimeout(() => {
+      this.errorMessage = '';
+    }, 3000);
+  }
+
+  cancelOrder() {
+    this.showOrderConfirmation = false;
   }
 
   deleteProduct(productId: string) {

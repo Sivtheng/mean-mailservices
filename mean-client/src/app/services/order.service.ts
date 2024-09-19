@@ -52,6 +52,7 @@ export class OrderService {
   }
 
   placeOrder(productId: string, quantity: number): Observable<any> {
+    const token = localStorage.getItem('token');
     return this.apollo.mutate({
       mutation: gql`
         mutation PlaceOrder($productId: ID!, $quantity: Int!) {
@@ -66,6 +67,9 @@ export class OrderService {
       variables: {
         productId,
         quantity
+      },
+      context: {
+        headers: new HttpHeaders().set('Authorization', `Bearer ${token}`)
       }
     });
   }
@@ -83,6 +87,38 @@ export class OrderService {
       variables: {
         orderId,
         status
+      }
+    });
+  }
+
+  confirmOrder(orderId: string): Observable<any> {
+    return this.apollo.mutate({
+      mutation: gql`
+        mutation ConfirmOrder($orderId: ID!) {
+          confirmOrder(orderId: $orderId) {
+            id
+            status
+          }
+        }
+      `,
+      variables: {
+        orderId
+      }
+    });
+  }
+
+  rejectOrder(orderId: string): Observable<any> {
+    return this.apollo.mutate({
+      mutation: gql`
+        mutation RejectOrder($orderId: ID!) {
+          rejectOrder(orderId: $orderId) {
+            id
+            status
+          }
+        }
+      `,
+      variables: {
+        orderId
       }
     });
   }

@@ -61,4 +61,28 @@ export class OrderHistoryComponent implements OnInit {
       }
     });
   }
+
+  confirmOrder(orderId: string) {
+    this.orderService.confirmOrder(orderId).subscribe({
+      next: (response) => {
+        console.log('Order confirmed successfully', response);
+        this.loadOrders();
+      },
+      error: (error) => {
+        console.error('Error confirming order:', error);
+      }
+    });
+  }
+
+  rejectOrder(orderId: string) {
+    this.orderService.rejectOrder(orderId).subscribe({
+      next: (response) => {
+        console.log('Order rejected successfully', response);
+        this.loadOrders();
+      },
+      error: (error) => {
+        console.error('Error rejecting order:', error);
+      }
+    });
+  }
 }
