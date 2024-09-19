@@ -4,12 +4,13 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import gql from 'graphql-tag';
 import { jwtDecode } from 'jwt-decode';
+import { LoggerService } from './logger.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  constructor(private apollo: Apollo) {}
+  constructor(private apollo: Apollo, private logger: LoggerService) {}
 
   login(email: string, password: string): Observable<{ success: boolean; message: string; token: string | null }> {
     return this.apollo.mutate({
@@ -57,7 +58,7 @@ export class AuthService {
   isLoggedIn(): boolean {
     if (typeof window !== 'undefined') {
       const isLoggedIn = !!localStorage.getItem('token');
-      console.log('isLoggedIn:', isLoggedIn);
+      this.logger.debug('isLoggedIn:', isLoggedIn);
       return isLoggedIn;
     }
     return false;
@@ -69,27 +70,25 @@ export class AuthService {
       if (token) {
         try {
           const decodedToken: any = jwtDecode(token);
-          console.log('Decoded token:', decodedToken);
+          this.logger.debug('Decoded token:', decodedToken);
           if (decodedToken && typeof decodedToken === 'object') {
-            console.log('User role from token:', decodedToken.role);
+            this.logger.debug('User role from token:', decodedToken.role);
             return decodedToken.role || '';
           }
         } catch (error) {
-          console.error('Error decoding token:', error);
+          this.logger.error('Error decoding token:', error);
         }
       }
     }
-    console.log('No token found or unable to decode');
+    this.logger.debug('No token found or unable to decode');
     return '';
   }
 
   logout() {
     if (typeof window !== 'undefined') {
-      localStorage.clear(); // This will remove all items from local storage
-      // If you want to remove only specific items, you can use:
-      // localStorage.removeItem('token');
-      // localStorage.removeItem('user');
+      localStorage.clear();
       this.apollo.client.resetStore();
+      this.logger.info('User logged out');
     }
   }
 }

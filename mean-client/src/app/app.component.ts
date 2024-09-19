@@ -3,6 +3,7 @@ import { RouterOutlet, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from './services/auth.service';
 import { Router } from '@angular/router';
+import { LoggerService, LogLevel } from './services/logger.service';
 
 @Component({
   selector: 'app-root',
@@ -18,24 +19,30 @@ import { Router } from '@angular/router';
 export class AppComponent {
   welcomeMessage: string = '';
 
-  constructor(public authService: AuthService, private router: Router) {
+  constructor(
+    public authService: AuthService,
+    private router: Router,
+    private logger: LoggerService
+  ) {
     this.setWelcomeMessage();
+    this.logger.setLevel(LogLevel.Info); // Set the desired log level
   }
 
   logout() {
     this.authService.logout();
     this.setWelcomeMessage();
-    this.router.navigate(['/']); // Navigate to home page after logout
+    this.router.navigate(['/']);
+    this.logger.info('User logged out and redirected to home page');
   }
 
   private setWelcomeMessage() {
     if (this.authService.isLoggedIn()) {
       const role = this.authService.getUserRole();
-      console.log('User role from AuthService:', role);
+      this.logger.debug('User role from AuthService:', role);
       this.welcomeMessage = `Welcome ${role}!`;
     } else {
       this.welcomeMessage = '';
     }
-    console.log('Welcome message set to:', this.welcomeMessage);
+    this.logger.debug('Welcome message set to:', this.welcomeMessage);
   }
 }
