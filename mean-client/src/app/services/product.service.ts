@@ -90,4 +90,29 @@ export class ProductService {
       }
     });
   }
+
+  updateProduct(id: string, name: string, description: string, price: number): Observable<any> {
+    const token = localStorage.getItem('token');
+    return this.apollo.mutate({
+      mutation: gql`
+        mutation UpdateProduct($id: ID!, $name: String!, $description: String!, $price: Float!) {
+          updateProduct(id: $id, name: $name, description: $description, price: $price) {
+            id
+            name
+            description
+            price
+          }
+        }
+      `,
+      variables: {
+        id,
+        name,
+        description,
+        price
+      },
+      context: {
+        headers: new HttpHeaders().set('Authorization', `Bearer ${token}`)
+      }
+    });
+  }
 }
