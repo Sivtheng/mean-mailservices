@@ -90,8 +90,8 @@ export class OrderService {
       ]
     });
   }
-
   updateOrderStatus(orderId: string, status: string): Observable<any> {
+    const token = localStorage.getItem('token');
     return this.apollo.mutate({
       mutation: gql`
         mutation UpdateOrderStatus($orderId: ID!, $status: String!) {
@@ -104,39 +104,12 @@ export class OrderService {
       variables: {
         orderId,
         status
+      },
+      context: {
+        headers: new HttpHeaders().set('Authorization', `Bearer ${token}`)
       }
     });
   }
 
-  confirmOrder(orderId: string): Observable<any> {
-    return this.apollo.mutate({
-      mutation: gql`
-        mutation ConfirmOrder($orderId: ID!) {
-          confirmOrder(orderId: $orderId) {
-            id
-            status
-          }
-        }
-      `,
-      variables: {
-        orderId
-      }
-    });
-  }
-
-  rejectOrder(orderId: string): Observable<any> {
-    return this.apollo.mutate({
-      mutation: gql`
-        mutation RejectOrder($orderId: ID!) {
-          rejectOrder(orderId: $orderId) {
-            id
-            status
-          }
-        }
-      `,
-      variables: {
-        orderId
-      }
-    });
-  }
+  // Remove the confirmOrder and rejectOrder methods if they exist
 }

@@ -63,26 +63,32 @@ export class OrderHistoryComponent implements OnInit {
   }
 
   confirmOrder(orderId: string) {
-    this.orderService.confirmOrder(orderId).subscribe({
-      next: (response) => {
-        console.log('Order confirmed successfully', response);
-        this.loadOrders();
-      },
-      error: (error) => {
-        console.error('Error confirming order:', error);
-      }
-    });
+    if (confirm('Are you sure you want to confirm this order?')) {
+      this.orderService.updateOrderStatus(orderId, 'completed').subscribe({
+        next: (response) => {
+          console.log('Order confirmed successfully', response);
+          this.loadOrders();
+        },
+        error: (error) => {
+          console.error('Error confirming order:', error);
+          this.errorMessage = 'Unable to confirm order. Please try again.';
+        }
+      });
+    }
   }
 
   rejectOrder(orderId: string) {
-    this.orderService.rejectOrder(orderId).subscribe({
-      next: (response) => {
-        console.log('Order rejected successfully', response);
-        this.loadOrders();
-      },
-      error: (error) => {
-        console.error('Error rejecting order:', error);
-      }
-    });
+    if (confirm('Are you sure you want to reject this order?')) {
+      this.orderService.updateOrderStatus(orderId, 'cancelled').subscribe({
+        next: (response) => {
+          console.log('Order rejected successfully', response);
+          this.loadOrders();
+        },
+        error: (error) => {
+          console.error('Error rejecting order:', error);
+          this.errorMessage = 'Unable to reject order. Please try again.';
+        }
+      });
+    }
   }
 }
