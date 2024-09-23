@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const Product = require('../models/Product');
 const Order = require('../models/Order');
+const AuthService = require('../services/AuthService');
 
 const authenticateUser = (context) => {
   const authHeader = context.req.headers.authorization;
@@ -189,6 +190,40 @@ const resolvers = {
       order.status = status;
       await order.save();
       return order;
+    },
+    forgotPassword: async (_, { email }) => {
+      console.log('Received forgotPassword request for email:', email);
+      try {
+        const result = await AuthService.forgotPassword(email);
+        console.log('ForgotPassword result:', result);
+        return {
+          success: true,
+          message: result.message
+        };
+      } catch (error) {
+        console.error('Error in forgotPassword resolver:', error);
+        return {
+          success: false,
+          message: error.message
+        };
+      }
+    },
+    resetPassword: async (_, { resetToken, newPassword }) => {
+      console.log('Received resetPassword request with token:', resetToken);
+      try {
+        const result = await AuthService.resetPassword(resetToken, newPassword);
+        console.log('ResetPassword result:', result);
+        return {
+          success: true,
+          message: result.message
+        };
+      } catch (error) {
+        console.error('Error in resetPassword resolver:', error);
+        return {
+          success: false,
+          message: error.message
+        };
+      }
     },
   },
 };

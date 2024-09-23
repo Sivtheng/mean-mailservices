@@ -122,4 +122,45 @@ export class AuthService {
       this.logger.info('User logged out');
     }
   }
+
+  forgotPassword(email: string): Observable<{ success: boolean; message: string }> {
+    console.log('AuthService.forgotPassword called with email:', email);
+    return this.apollo.mutate({
+      mutation: gql`
+        mutation ForgotPassword($email: String!) {
+          forgotPassword(email: $email) {
+            success
+            message
+          }
+        }
+      `,
+      variables: {
+        email
+      }
+    }).pipe(
+      map((result: any) => {
+        console.log('GraphQL forgotPassword response:', result);
+        return result.data.forgotPassword;
+      })
+    );
+  }
+
+  resetPassword(resetToken: string, newPassword: string): Observable<{ success: boolean; message: string }> {
+    return this.apollo.mutate({
+      mutation: gql`
+        mutation ResetPassword($resetToken: String!, $newPassword: String!) {
+          resetPassword(resetToken: $resetToken, newPassword: $newPassword) {
+            success
+            message
+          }
+        }
+      `,
+      variables: {
+        resetToken,
+        newPassword
+      }
+    }).pipe(
+      map((result: any) => result.data.resetPassword)
+    );
+  }
 }

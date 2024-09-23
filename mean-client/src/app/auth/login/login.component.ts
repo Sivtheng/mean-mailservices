@@ -14,6 +14,7 @@ export class LoginComponent {
   email: string = '';
   password: string = '';
   errorMessage: string = '';
+  successMessage: string = '';
 
   constructor(private authService: AuthService, private router: Router) {}
 
@@ -30,6 +31,33 @@ export class LoginComponent {
       error: (error) => {
         console.error('Login error:', error);
         this.errorMessage = 'An unexpected error occurred. Please try again.';
+      }
+    });
+  }
+
+  forgotPassword() {
+    if (!this.email) {
+      this.errorMessage = 'Please enter your email address.';
+      return;
+    }
+
+    console.log('LoginComponent.forgotPassword called with email:', this.email);
+
+    this.authService.forgotPassword(this.email).subscribe({
+      next: (response) => {
+        console.log('ForgotPassword response:', response);
+        if (response.success) {
+          this.successMessage = response.message;
+          this.errorMessage = '';
+        } else {
+          this.errorMessage = response.message;
+          this.successMessage = '';
+        }
+      },
+      error: (error) => {
+        console.error('Forgot password error:', error);
+        this.errorMessage = 'An error occurred. Please try again.';
+        this.successMessage = '';
       }
     });
   }

@@ -8,6 +8,7 @@ import { AuthGuard } from './auth/auth.guard';
 import { HomeComponent } from './home/home.component';
 import { AddProductComponent } from './components/add-product.component';
 import { EditProductComponent } from './components/edit-product.component';
+import { ResetPasswordComponent } from './components/reset-password.component';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -18,5 +19,6 @@ export const routes: Routes = [
   { path: 'order-history', component: OrderHistoryComponent, canActivate: [AuthGuard] },
   { path: 'email-preferences', component: EmailPreferencesComponent, canActivate: [AuthGuard] },
   { path: 'edit-product/:id', component: EditProductComponent, canActivate: [AuthGuard] },
+  { path: 'reset-password/:token', component: ResetPasswordComponent },
   { path: '**', redirectTo: '' },
 ];

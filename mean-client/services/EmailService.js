@@ -25,17 +25,6 @@ class EmailService {
     await this.transporter.sendMail(mailOptions);
   }
 
-  static async sendPasswordResetEmail(user, resetToken) {
-    const mailOptions = {
-      from: '"E-commerce App" <noreply@ecommerce.com>',
-      to: user.email,
-      subject: 'Password Reset',
-      html: `<p>Please click <a href="http://localhost:4200/reset-password/${resetToken}">here</a> to reset your password.</p>`
-    };
-
-    await this.transporter.sendMail(mailOptions);
-  }
-
   static async sendOrderConfirmationEmail(order) {
     const user = await User.findById(order.userId);
     const mailOptions = {
@@ -121,6 +110,21 @@ class EmailService {
       html: `<p>Hello ${user.name}, check out our exciting promotions for this month!</p>`
     };
     await this.transporter.sendMail(mailOptions);
+  }
+
+  static async sendPasswordResetEmail(email, resetToken) {
+    console.log('Sending password reset email to:', email, 'with token:', resetToken);
+    const mailOptions = {
+      from: '"E-commerce App" <noreply@ecommerce.com>',
+      to: email,
+      subject: 'Password Reset',
+      html: `<p>You requested a password reset. Please click on the following link to reset your password:</p>
+<a href="http://localhost:4200/reset-password/${resetToken}">Reset Password</a>
+<p>If you did not request this, please ignore this email and your password will remain unchanged.</p>`
+    };
+
+    await this.transporter.sendMail(mailOptions);
+    console.log('Password reset email sent to:', email);
   }
 }
 

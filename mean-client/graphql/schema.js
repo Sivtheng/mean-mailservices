@@ -45,6 +45,16 @@ const typeDefs = gql`
     token: String
   }
 
+  type ForgotPasswordResponse {
+    success: Boolean!
+    message: String!
+  }
+
+  type ResetPasswordResponse {
+    success: Boolean!
+    message: String!
+  }
+
   type Mutation {
     createProduct(name: String!, description: String, price: Float!): Product
     updateProduct(id: ID!, name: String, description: String, price: Float): Product
@@ -53,6 +63,8 @@ const typeDefs = gql`
     loginUser(email: String!, password: String!): LoginResponse!
     placeOrder(productId: ID!): Order
     updateOrderStatus(orderId: ID!, status: String!): Order
+    forgotPassword(email: String!): ForgotPasswordResponse!
+    resetPassword(resetToken: String!, newPassword: String!): ResetPasswordResponse!
   }
 `;
 
