@@ -15,17 +15,17 @@ import { ProductService } from '../services/product.service';
         <div class="mb-4">
           <label for="name" class="block text-gray-700 text-sm font-bold mb-2">Product Name:</label>
           <input type="text" id="name" name="name" [(ngModel)]="product.name" required
-                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+              class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
         </div>
         <div class="mb-4">
           <label for="description" class="block text-gray-700 text-sm font-bold mb-2">Description:</label>
           <textarea id="description" name="description" [(ngModel)]="product.description" required
-                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"></textarea>
+              class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"></textarea>
         </div>
         <div class="mb-4">
           <label for="price" class="block text-gray-700 text-sm font-bold mb-2">Price:</label>
           <input type="number" id="price" name="price" [(ngModel)]="product.price" required
-                 class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+              class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
         </div>
         <button type="submit" [disabled]="!productForm.form.valid"
                 class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
