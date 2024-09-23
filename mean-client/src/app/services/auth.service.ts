@@ -163,4 +163,19 @@ export class AuthService {
       map((result: any) => result.data.resetPassword)
     );
   }
+
+  isVerified(): boolean {
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('token');
+      if (token) {
+        try {
+          const decodedToken: any = jwtDecode(token);
+          return decodedToken.isVerified || false;
+        } catch (error) {
+          this.logger.error('Error decoding token:', error);
+        }
+      }
+    }
+    return false;
+  }
 }

@@ -10,7 +10,13 @@ export class AuthGuard implements CanActivate {
 
   canActivate(): boolean {
     if (this.authService.isLoggedIn()) {
-      return true;
+      if (this.authService.isVerified()) {
+        return true;
+      } else {
+        alert('Your account is not verified. Please verify your email to access this page.');
+        this.router.navigate(['/login']);
+        return false;
+      }
     } else {
       this.router.navigate(['/login']);
       return false;

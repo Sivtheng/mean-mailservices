@@ -131,7 +131,7 @@ const resolvers = {
           throw new Error('Invalid credentials');
         }
 
-        const tokenPayload = { userId: user._id, role: user.role };
+        const tokenPayload = { userId: user._id, role: user.role, isVerified: user.isVerified };
         console.log('Token payload:', tokenPayload);
         const token = jwt.sign(tokenPayload, process.env.JWT_SECRET, { expiresIn: '1h' });
         return {

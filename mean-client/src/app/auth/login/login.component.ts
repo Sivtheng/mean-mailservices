@@ -23,7 +23,11 @@ export class LoginComponent {
       next: (response) => {
         if (response.success) {
           this.authService.startSessionTimer();
-          this.router.navigate(['/products']);
+          if (this.authService.isVerified()) {
+            this.router.navigate(['/products']);
+          } else {
+            this.successMessage = 'Login successful, but your account is not verified. Please verify your email.';
+          }
         } else {
           this.errorMessage = response.message;
         }
