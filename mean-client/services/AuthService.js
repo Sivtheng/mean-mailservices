@@ -2,7 +2,6 @@ const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const EmailService = require('../services/EmailService');
-const crypto = require('crypto');
 
 class AuthService {
   async registerUser({ name, email, password, role }) {
@@ -36,10 +35,8 @@ class AuthService {
   }
 
   async forgotPassword(email) {
-    console.log('AuthService.forgotPassword called with email:', email);
     const user = await User.findOne({ email });
     if (!user) {
-      console.error('User not found for email:', email);
       throw new Error('User not found');
     }
 
@@ -55,34 +52,20 @@ class AuthService {
   }
 
   async resetPassword(resetToken, newPassword) {
-    console.log('AuthService.resetPassword called with token:', resetToken);
-
-    // Log the current time for comparison
-    const currentTime = Date.now();
-    console.log('Current time:', currentTime);
-
-    // Find the user with the reset token and check if the token is not expired
     const user = await User.findOne({
       resetPasswordToken: resetToken,
-      resetPasswordExpires: { $gt: currentTime }
+      resetPasswordExpires: { $gt: Date.now() }
     });
 
     if (!user) {
-      console.error('Invalid or expired reset token');
       throw new Error('Invalid or expired reset token');
     }
 
-    console.log('User found for reset token:', user.email);
-    console.log('Reset token expiry time:', user.resetPasswordExpires);
-
-    // Hash the new password and save it
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     user.password = hashedPassword;
     user.resetPasswordToken = undefined;
     user.resetPasswordExpires = undefined;
     await user.save();
-
-    console.log('Password reset successful for user:', user.email);
 
     return { message: 'Password reset successful' };
   }

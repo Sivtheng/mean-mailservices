@@ -113,18 +113,17 @@ class EmailService {
   }
 
   static async sendPasswordResetEmail(email, resetToken) {
-    console.log('Sending password reset email to:', email, 'with token:', resetToken);
+    const resetUrl = `http://localhost:4200/reset-password/${resetToken}`;
     const mailOptions = {
       from: '"E-commerce App" <noreply@ecommerce.com>',
       to: email,
       subject: 'Password Reset',
       html: `<p>You requested a password reset. Please click on the following link to reset your password:</p>
-<a href="http://localhost:4200/reset-password/${resetToken}">Reset Password</a>
+<a href="${resetUrl}">Reset Password</a>
 <p>If you did not request this, please ignore this email and your password will remain unchanged.</p>`
     };
 
     await this.transporter.sendMail(mailOptions);
-    console.log('Password reset email sent to:', email);
   }
 }
 

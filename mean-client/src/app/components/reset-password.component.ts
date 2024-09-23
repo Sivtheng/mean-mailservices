@@ -20,7 +20,6 @@ export class ResetPasswordComponent {
     constructor(private route: ActivatedRoute, private authService: AuthService, private router: Router) {
         this.route.params.subscribe(params => {
             this.resetToken = params['token'];
-            console.log('Reset token from URL:', this.resetToken); // Log the token from the URL
         });
     }
 
@@ -29,9 +28,6 @@ export class ResetPasswordComponent {
             this.errorMessage = 'Passwords do not match';
             return;
         }
-
-        console.log('Submitting reset password with token:', this.resetToken); // Log the token being submitted
-
         this.authService.resetPassword(this.resetToken, this.newPassword).subscribe({
             next: (response) => {
                 if (response.success) {
@@ -46,7 +42,6 @@ export class ResetPasswordComponent {
                 }
             },
             error: (error) => {
-                console.error('Reset password error:', error);
                 this.errorMessage = 'An error occurred. Please try again.';
                 this.successMessage = '';
             }
