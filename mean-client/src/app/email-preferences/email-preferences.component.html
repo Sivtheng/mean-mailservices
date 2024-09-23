@@ -1,16 +1,18 @@
-<h2>Email Preferences</h2>
-<form (ngSubmit)="onSubmit()">
-  <div>
-    <label>
-      <input type="checkbox" [(ngModel)]="newsletterOptIn" name="newsletterOptIn">
-      Receive newsletters
-    </label>
-  </div>
-  <div>
-    <label>
-      <input type="checkbox" [(ngModel)]="allEmailsOptIn" name="allEmailsOptIn">
-      Receive all emails
-    </label>
-  </div>
-  <button type="submit">Update Preferences</button>
-</form>
+<div class="container mx-auto px-4 py-8">
+  <h2 class="text-3xl font-bold mb-6 text-center text-gray-800">Email Preferences</h2>
+  <form (ngSubmit)="onSubmit()" class="bg-white shadow-md rounded-lg p-6">
+    <div class="mb-4">
+      <label class="flex items-center">
+        <input type="checkbox" [(ngModel)]="newsletterOptIn" name="newsletterOptIn" class="form-checkbox h-5 w-5 text-blue-600">
+        <span class="ml-2 text-gray-700">Receive newsletters</span>
+      </label>
+    </div>
+    <div class="mb-4">
+      <label class="flex items-center">
+        <input type="checkbox" [(ngModel)]="allEmailsOptIn" name="allEmailsOptIn" class="form-checkbox h-5 w-5 text-blue-600">
+        <span class="ml-2 text-gray-700">Receive all emails</span>
+      </label>
+    </div>
+    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded transition duration-200">Update Preferences</button>
+  </form>
+</div>
