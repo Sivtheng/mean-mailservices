@@ -4,6 +4,8 @@ const User = require('../models/User');
 const Product = require('../models/Product');
 const Order = require('../models/Order');
 const AuthService = require('../services/AuthService');
+const OrderService = require('../services/OrderService');
+const EmailService = require('../services/EmailService');
 
 const authenticateUser = (context) => {
   const authHeader = context.req.headers.authorization;
@@ -137,22 +139,28 @@ const resolvers = {
         if (user.role !== 'buyer') {
           throw new Error('Access denied. Buyers only.');
         }
+
+        const order = await OrderService.createOrder({ userId: user.userId, productId });
+
+        // Fetch the product and seller details
         const product = await Product.findById(productId);
-        if (!product) {
-          throw new Error('Product not found');
-        }
-        const order = new Order({
-          userId: user.userId,
-          productId: product._id,
-          productName: product.name,
-          productPrice: product.price,
-          status: 'pending'
-        });
-        await order.save();
-        return order;
+        const seller = await User.findById(product.sellerId);
+
+        // Send notification email to seller
+        await EmailService.sendOrderNotificationToSeller(order, seller.email);
+
+        return {
+          success: true,
+          message: 'Order placed successfully and seller notified',
+          order
+        };
       } catch (error) {
         console.error('Server-side error in placeOrder:', error);
-        throw error;
+        return {
+          success: false,
+          message: error.message,
+          order: null
+        };
       }
     },
     updateOrderStatus: async (_, { orderId, status }, context) => {

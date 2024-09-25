@@ -38,28 +38,30 @@ class EmailService {
     }
   }
 
-  static async sendOrderConfirmationEmail(order) {
-    const user = await User.findById(order.userId);
+  static async sendOrderNotificationToSeller(order, sellerEmail) {
+    console.log(`Sending order notification email to seller: ${sellerEmail}`);
     const mailOptions = {
       from: '"E-commerce App" <noreply@ecommerce.com>',
-      to: user.email,
-      subject: 'Order Confirmation',
-      html: `<p>Your order #${order.id} has been confirmed.</p>`
-    };
-
-    await this.transporter.sendMail(mailOptions);
-  }
-
-  static async sendSellerNotificationEmail(order) {
-    const seller = await User.findOne({ role: 'seller' });
-    const mailOptions = {
-      from: '"E-commerce App" <noreply@ecommerce.com>',
-      to: seller.email,
+      to: sellerEmail,
       subject: 'New Order Received',
-      html: `<p>You have received a new order #${order.id}.</p>`
+      html: `
+        <p>You have received a new order!</p>
+        <p>Order details:</p>
+        <ul>
+          <li>Order ID: ${order.id}</li>
+          <li>Product: ${order.productName}</li>
+          <li>Price: $${order.productPrice}</li>
+        </ul>
+        <p>Click <a href="http://localhost:4200/order-history">here</a> to view your order history.</p>
+      `
     };
-
-    await this.transporter.sendMail(mailOptions);
+  
+    try {
+      await this.transporter.sendMail(mailOptions);
+      console.log(`Order notification email sent successfully to: ${sellerEmail}`);
+    } catch (error) {
+      console.error(`Error sending order notification email to ${sellerEmail}:`, error);
+    }
   }
 
   static async updateEmailPreference({ userId, newsletterOptIn, allEmailsOptIn }) {

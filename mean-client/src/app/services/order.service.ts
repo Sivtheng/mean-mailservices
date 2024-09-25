@@ -59,11 +59,15 @@ export class OrderService {
       mutation: gql`
         mutation PlaceOrder($productId: ID!) {
           placeOrder(productId: $productId) {
-            id
-            productId
-            productName
-            productPrice
-            status
+            success
+            message
+            order {
+              id
+              productId
+              productName
+              productPrice
+              status
+            }
           }
         }
       `,
@@ -72,22 +76,7 @@ export class OrderService {
       },
       context: {
         headers: new HttpHeaders().set('Authorization', `Bearer ${token}`)
-      },
-      refetchQueries: [
-        {
-          query: gql`
-            query GetMyOrders {
-              getMyOrders {
-                id
-                productId
-                productName
-                productPrice
-                status
-              }
-            }
-          `
-        }
-      ]
+      }
     });
   }
   updateOrderStatus(orderId: string, status: string): Observable<any> {

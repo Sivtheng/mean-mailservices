@@ -61,7 +61,7 @@ const typeDefs = gql`
     deleteProduct(id: ID!): Boolean
     registerUser(name: String!, email: String!, password: String!, role: String!): RegisterResponse!
     loginUser(email: String!, password: String!): LoginResponse!
-    placeOrder(productId: ID!): Order
+    placeOrder(productId: ID!): PlaceOrderResponse!
     updateOrderStatus(orderId: ID!, status: String!): Order
     forgotPassword(email: String!): ForgotPasswordResponse!
     resetPassword(resetToken: String!, newPassword: String!): ResetPasswordResponse!
@@ -71,6 +71,12 @@ const typeDefs = gql`
   type VerificationResponse {
     success: Boolean!
     message: String!
+  }
+
+  type PlaceOrderResponse {
+    success: Boolean!
+    message: String!
+    order: Order
   }
 `;
 

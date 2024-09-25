@@ -1,6 +1,7 @@
 const Order = require('../models/Order.js');
-const EmailService = require('./EmailService.js');
 const Product = require('../models/Product.js');
+const User = require('../models/User.js');
+const EmailService = require('./EmailService.js');
 
 class OrderService {
   static async createOrder({ userId, productId }) {
@@ -8,6 +9,12 @@ class OrderService {
     if (!product) {
       throw new Error('Product not found');
     }
+
+    const seller = await User.findById(product.sellerId);
+    if (!seller) {
+      throw new Error('Seller not found');
+    }
+
     const order = new Order({
       userId,
       productId,
@@ -16,12 +23,6 @@ class OrderService {
       status: 'pending'
     });
     await order.save();
-
-    // Send order confirmation email to buyer
-    await EmailService.sendOrderConfirmationEmail(order);
-
-    // Send notification email to seller
-    await EmailService.sendSellerNotificationEmail(order);
 
     return order;
   }
