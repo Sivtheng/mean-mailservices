@@ -168,7 +168,7 @@ const resolvers = {
       if (user.role !== 'seller') {
         throw new Error('Access denied. Sellers only.');
       }
-      const order = await Order.findById(orderId);
+      const order = await Order.findById(orderId).populate('userId', 'email');
       if (!order) {
         throw new Error('Order not found');
       }
@@ -181,6 +181,13 @@ const resolvers = {
       }
       order.status = status;
       await order.save();
+
+      if (status === 'completed' || status === 'cancelled') {
+        if (order.userId && order.userId.email) {
+          await EmailService.sendOrderStatusUpdateToBuyer(order, order.userId.email);
+        }
+      }
+
       return order;
     },
     forgotPassword: async (_, { email }) => {

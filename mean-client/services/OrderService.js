@@ -28,7 +28,11 @@ class OrderService {
   }
 
   static async getOrders(userId) {
-    return Order.find({ userId });
+    return Order.find({ userId }).populate('userId', 'email');
+  }
+
+  static async getOrderById(orderId) {
+    return Order.findById(orderId).populate('userId', 'email');
   }
 }
 

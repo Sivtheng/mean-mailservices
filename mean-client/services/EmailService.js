@@ -140,6 +140,34 @@ class EmailService {
 
     await this.transporter.sendMail(mailOptions);
   }
+
+  static async sendOrderStatusUpdateToBuyer(order, buyerEmail) {
+    console.log(`Sending order status update email to buyer: ${buyerEmail}`);
+    const statusMessage = order.status === 'completed' ? 'confirmed' : 'cancelled';
+    const mailOptions = {
+      from: '"E-commerce App" <noreply@ecommerce.com>',
+      to: buyerEmail,
+      subject: `Your Order Has Been ${statusMessage.charAt(0).toUpperCase() + statusMessage.slice(1)}`,
+      html: `
+        <p>Your order has been ${statusMessage} by the seller.</p>
+        <p>Order details:</p>
+        <ul>
+          <li>Order ID: ${order.id}</li>
+          <li>Product: ${order.productName}</li>
+          <li>Price: $${order.productPrice}</li>
+          <li>Status: ${order.status}</li>
+        </ul>
+        ${order.status === 'completed' ? '<p>Thank you for shopping with us!</p>' : '<p>We apologize for any inconvenience caused.</p>'}
+      `
+    };
+
+    try {
+      await this.transporter.sendMail(mailOptions);
+      console.log(`Order status update email sent successfully to buyer: ${buyerEmail}`);
+    } catch (error) {
+      console.error(`Error sending order status update email to buyer ${buyerEmail}:`, error);
+    }
+  }
 }
 
 module.exports = EmailService;
