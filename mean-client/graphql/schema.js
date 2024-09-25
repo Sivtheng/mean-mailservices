@@ -65,6 +65,12 @@ const typeDefs = gql`
     updateOrderStatus(orderId: ID!, status: String!): Order
     forgotPassword(email: String!): ForgotPasswordResponse!
     resetPassword(resetToken: String!, newPassword: String!): ResetPasswordResponse!
+    verifyEmail(userId: String!): VerificationResponse!
+  }
+
+  type VerificationResponse {
+    success: Boolean!
+    message: String!
   }
 `;
 

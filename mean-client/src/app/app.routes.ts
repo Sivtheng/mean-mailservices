@@ -9,11 +9,13 @@ import { HomeComponent } from './home/home.component';
 import { AddProductComponent } from './components/add-product.component';
 import { EditProductComponent } from './components/edit-product.component';
 import { ResetPasswordComponent } from './components/reset-password.component';
+import { EmailVerificationComponent } from './components/email-verification.component';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
+  { path: 'verify-email/:token', component: EmailVerificationComponent }, // New route
   { path: 'products', component: ProductListComponent, canActivate: [AuthGuard] },
   { path: 'add-product', component: AddProductComponent, canActivate: [AuthGuard] },
   { path: 'order-history', component: OrderHistoryComponent, canActivate: [AuthGuard] },

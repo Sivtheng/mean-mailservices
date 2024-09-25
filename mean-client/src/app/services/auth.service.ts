@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Apollo } from 'apollo-angular';
-import { Observable } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
+import { map, tap, catchError } from 'rxjs/operators';
 import gql from 'graphql-tag';
 import { jwtDecode } from 'jwt-decode';
 import { LoggerService } from './logger.service';
@@ -177,5 +177,27 @@ export class AuthService {
       }
     }
     return false;
+  }
+
+  async verifyEmail(userId: string): Promise<Observable<{ success: boolean; message: string; }>> {
+    return this.apollo.mutate({
+      mutation: gql`
+        mutation VerifyEmail($userId: String!) {
+          verifyEmail(userId: $userId) {
+            success
+            message
+          }
+        }
+      `,
+      variables: {
+        userId
+      }
+    }).pipe(
+      map((result: any) => result.data.verifyEmail),
+      catchError((error) => {
+        console.error('GraphQL error:', error);
+        return of({ success: false, message: error.message });
+      })
+    );
   }
 }

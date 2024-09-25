@@ -9,6 +9,7 @@ const mongoose = require('mongoose');
 const typeDefs = require('./mean-client/graphql/schema.js');
 const resolvers = require('./mean-client/graphql/resolvers.js');
 const CronService = require('./mean-client/services/CronService');
+const jwt = require('jsonwebtoken');
 
 require('dotenv').config({ path: '.env' });
 
@@ -53,4 +54,16 @@ startApolloServer();
 app.use((req, res, next) => {
   console.log(`Received ${req.method} request to ${req.url}`);
   next();
+});
+
+// Verification route
+app.get('/verify-email/:token', async (req, res) => {
+  try {
+    const { token } = req.params;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    await AuthService.verifyEmail(decoded.userId);
+    res.send('Email verified successfully! You can now log in.');
+  } catch (error) {
+    res.status(400).send('Invalid or expired token.');
+  }
 });

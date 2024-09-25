@@ -5,16 +5,29 @@ const EmailService = require('../services/EmailService');
 
 class AuthService {
   async registerUser({ name, email, password, role }) {
+    console.log('Starting user registration process');
     const existingUser = await User.findOne({ email });
     if (existingUser) {
+      console.log('User already exists');
       throw new Error('User already exists');
     }
 
+    console.log('Creating new user');
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = new User({ name, email, password: hashedPassword, role });
     await user.save();
 
-    await EmailService.sendVerificationEmail(user);
+    console.log('User saved, attempting to send verification email');
+    try {
+      await EmailService.sendVerificationEmail(user);
+      console.log('Verification email sent successfully');
+    } catch (error) {
+      console.error('Error sending verification email:', error);
+      // Delete the user if email sending fails
+      console.warn('Verification email could not be sent. Deleting user.');
+      await User.deleteOne({ _id: user._id });
+      throw new Error('Failed to send verification email. Please try registering again.');
+    }
 
     return user;
   }
@@ -30,8 +43,12 @@ class AuthService {
       throw new Error('Invalid credentials');
     }
 
+    if (!user.isVerified) {
+      await EmailService.sendVerificationEmail(user);
+      throw new Error('Email not verified. A verification email has been sent.');
+    }
+
     const tokenPayload = { userId: user._id, role: user.role, isVerified: user.isVerified };
-    console.log('Token payload:', tokenPayload);
     const token = jwt.sign(tokenPayload, process.env.JWT_SECRET, { expiresIn: '1h' });
     return token;
   }
@@ -79,24 +96,6 @@ class AuthService {
     } catch (error) {
       throw new Error('Invalid token');
     }
-  }
-
-  async verifyEmail(userId) {
-    const user = await User.findById(userId);
-    if (!user) {
-      throw new Error('User not found');
-    }
-
-    if (user.isVerified) {
-      throw new Error('Email already verified');
-    }
-
-    user.isVerified = true;
-    await user.save();
-
-    await EmailService.sendWelcomeEmail(user);
-
-    return { message: 'Email verified successfully' };
   }
 }
 

@@ -23,8 +23,10 @@ export class RegisterComponent {
   constructor(private authService: AuthService, private router: Router) {}
 
   onSubmit() {
+    console.log('Submitting registration form');
     this.authService.register(this.name, this.email, this.password, this.role).subscribe({
       next: (response) => {
+        console.log('Registration response:', response);
         if (response.success) {
           console.log('User registered:', response.user);
           this.router.navigate(['/login']);

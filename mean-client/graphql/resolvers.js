@@ -85,33 +85,17 @@ const resolvers = {
       return result.deletedCount > 0;
     },
     registerUser: async (_, { name, email, password, role }) => {
+      console.log('Received registration request for:', email);
       try {
-        // Check if user already exists
-        const existingUser = await User.findOne({ email });
-        if (existingUser) {
-          throw new Error('User with this email already exists');
-        }
-
-        // Validate password strength
-        if (password.length < 8) {
-          throw new Error('Password must be at least 8 characters long');
-        }
-
-        // Validate role
-        if (!['buyer', 'seller'].includes(role)) {
-          throw new Error('Invalid role. Must be either "buyer" or "seller"');
-        }
-
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const user = new User({ name, email, password: hashedPassword, role });
-        await user.save();
-
+        const user = await AuthService.registerUser({ name, email, password, role });
+        console.log('User registered successfully:', user.email);
         return {
           success: true,
           message: 'User registered successfully',
           user
         };
       } catch (error) {
+        console.error('Error during user registration:', error);
         return {
           success: false,
           message: error.message,
@@ -223,6 +207,27 @@ const resolvers = {
           success: false,
           message: error.message
         };
+      }
+    },
+    verifyEmail: async (_, { userId }) => {
+      console.log('Received verifyEmail request for userId:', userId);
+      try {
+        const user = await User.findById(userId);
+        console.log('Found user:', user);
+        if (!user) {
+          return { success: false, message: 'User not found' };
+        }
+        if (user.isVerified) {
+          console.log('User already verified');
+          return { success: true, message: 'Email already verified' };
+        }
+        user.isVerified = true;
+        await user.save();
+        console.log('User verified successfully');
+        return { success: true, message: 'Email verified successfully' };
+      } catch (error) {
+        console.error('Error verifying email:', error);
+        return { success: false, message: error.message };
       }
     },
   },

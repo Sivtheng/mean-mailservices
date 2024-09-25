@@ -1,6 +1,7 @@
 const nodemailer = require('nodemailer');
 const User = require('../models/User.js');
 const EmailPreference = require('../models/EmailPreference.js');
+const jwt = require('jsonwebtoken');
 
 require('dotenv').config();
 
@@ -15,14 +16,26 @@ class EmailService {
   });
 
   static async sendVerificationEmail(user) {
-    const mailOptions = {
-      from: '"E-commerce App" <noreply@ecommerce.com>',
-      to: user.email,
-      subject: 'Verify Your Email',
-      html: `<p>Please click <a href="http://localhost:4200/verify-email/${user.id}">here</a> to verify your email.</p>`
-    };
+    console.log('Attempting to send verification email to:', user.email);
+    try {
+      const verificationToken = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+      const verificationUrl = `http://localhost:4200/verify-email/${verificationToken}`;
 
-    await this.transporter.sendMail(mailOptions);
+      const mailOptions = {
+        from: '"E-commerce App" <noreply@ecommerce.com>',
+        to: user.email,
+        subject: 'Verify Your Email',
+        html: `<p>Please click <a href="${verificationUrl}">here</a> to verify your email.</p>`
+      };
+
+      console.log('Sending verification email with options:', mailOptions);
+      const info = await this.transporter.sendMail(mailOptions);
+      console.log('Verification email sent successfully. Message ID:', info.messageId);
+      return info;
+    } catch (error) {
+      console.error('Error in sendVerificationEmail:', error);
+      throw error;
+    }
   }
 
   static async sendOrderConfirmationEmail(order) {
