@@ -52,6 +52,10 @@ const resolvers = {
       const productIds = products.map(product => product._id);
       return await Order.find({ productId: { $in: productIds } });
     },
+    getCurrentUser: async (_, __, context) => {
+      const user = authenticateUser(context);
+      return await User.findById(user.userId);
+    },
   },
   Mutation: {
     createProduct: async (_, { name, description, price }, context) => {
@@ -243,6 +247,21 @@ const resolvers = {
       } catch (error) {
         console.error('Error verifying email:', error);
         return { success: false, message: error.message };
+      }
+    },
+    updateEmailPreferences: async (_, { newsletterOptIn, allEmailsOptIn }, context) => {
+      try {
+        const user = authenticateUser(context);
+        const updatedPreferences = await EmailService.updateEmailPreference({
+          userId: user.userId,
+          newsletterOptIn,
+          allEmailsOptIn
+        });
+        return updatedPreferences;
+        
+      } catch (error) {
+        console.error('Error updating email preferences:', error);
+        throw new Error(`Failed to update email preferences: ${error.message}`);
       }
     },
   },

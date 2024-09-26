@@ -5,31 +5,44 @@ const EmailService = require('../services/EmailService');
 
 class AuthService {
   async registerUser({ name, email, password, role }) {
-    console.log('Starting user registration process');
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      console.log('User already exists');
-      throw new Error('User already exists');
-    }
-
-    console.log('Creating new user');
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const user = new User({ name, email, password: hashedPassword, role });
-    await user.save();
-
-    console.log('User saved, attempting to send verification email');
+    console.log('Starting user registration process for email:', email);
     try {
-      await EmailService.sendVerificationEmail(user);
-      console.log('Verification email sent successfully');
-    } catch (error) {
-      console.error('Error sending verification email:', error);
-      // Delete the user if email sending fails
-      console.warn('Verification email could not be sent. Deleting user.');
-      await User.deleteOne({ _id: user._id });
-      throw new Error('Failed to send verification email. Please try registering again.');
-    }
+      const existingUser = await User.findOne({ email });
+      console.log('Existing user check result:', existingUser);
+      if (existingUser) {
+        console.log('User already exists:', existingUser);
+        throw new Error('User already exists');
+      }
 
-    return user;
+      console.log('Creating new user');
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const user = new User({
+        name,
+        email,
+        password: hashedPassword,
+        role,
+        newsletterOptIn: true,
+        allEmailsOptIn: true
+      });
+      await user.save();
+
+      console.log('User saved, attempting to send verification email');
+      try {
+        await EmailService.sendVerificationEmail(user);
+        console.log('Verification email sent successfully');
+      } catch (error) {
+        console.error('Error sending verification email:', error);
+        // Delete the user if email sending fails
+        console.warn('Verification email could not be sent. Deleting user.');
+        await User.deleteOne({ _id: user._id });
+        throw new Error('Failed to send verification email. Please try registering again.');
+      }
+
+      return user;
+    } catch (error) {
+      console.error('Error in registerUser:', error);
+      throw error;
+    }
   }
 
   async loginUser(email, password) {

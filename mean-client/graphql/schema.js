@@ -14,6 +14,9 @@ const typeDefs = gql`
     name: String!
     email: String!
     role: String!
+    isVerified: Boolean!
+    newsletterOptIn: Boolean!
+    allEmailsOptIn: Boolean!
   }
 
   type Query {
@@ -22,6 +25,7 @@ const typeDefs = gql`
     getMyOrders: [Order]
     getMyProducts: [Product]
     getOrdersBySeller: [Order]
+    getCurrentUser: User
   }
 
   type Order {
@@ -66,6 +70,7 @@ const typeDefs = gql`
     forgotPassword(email: String!): ForgotPasswordResponse!
     resetPassword(resetToken: String!, newPassword: String!): ResetPasswordResponse!
     verifyEmail(userId: String!): VerificationResponse!
+    updateEmailPreferences(newsletterOptIn: Boolean!, allEmailsOptIn: Boolean!): EmailPreferencesResponse!
   }
 
   type VerificationResponse {
@@ -77,6 +82,12 @@ const typeDefs = gql`
     success: Boolean!
     message: String!
     order: Order
+  }
+
+  type EmailPreferencesResponse {
+    userId: ID!
+    newsletterOptIn: Boolean!
+    allEmailsOptIn: Boolean!
   }
 `;
 

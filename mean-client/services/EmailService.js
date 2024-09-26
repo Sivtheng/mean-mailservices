@@ -1,6 +1,5 @@
 const nodemailer = require('nodemailer');
 const User = require('../models/User.js');
-const EmailPreference = require('../models/EmailPreference.js');
 const jwt = require('jsonwebtoken');
 
 require('dotenv').config();
@@ -65,19 +64,29 @@ class EmailService {
   }
 
   static async updateEmailPreference({ userId, newsletterOptIn, allEmailsOptIn }) {
-    let preference = await EmailPreference.findOne({ userId });
-    if (!preference) {
-      preference = new EmailPreference({ userId, newsletterOptIn, allEmailsOptIn });
-    } else {
-      preference.newsletterOptIn = newsletterOptIn;
-      preference.allEmailsOptIn = allEmailsOptIn;
+    try {
+      const user = await User.findByIdAndUpdate(
+        userId,
+        { newsletterOptIn, allEmailsOptIn },
+        { new: true, runValidators: true }
+      );
+      if (!user) {
+        throw new Error('User not found');
+      }
+      return {
+        userId: user._id,
+        newsletterOptIn: user.newsletterOptIn,
+        
+        allEmailsOptIn: user.allEmailsOptIn
+      };
+    } catch (error) {
+      console.error('Error in updateEmailPreference:', error);
+      throw error;
     }
-    await preference.save();
-    return preference;
   }
 
   static async sendNewsletter() {
-    const users = await User.find({ 'emailPreference.newsletterOptIn': true });
+    const users = await User.find({ newsletterOptIn: true });
     for (const user of users) {
       const mailOptions = {
         from: '"E-commerce App" <noreply@ecommerce.com>',

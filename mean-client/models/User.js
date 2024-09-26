@@ -8,7 +8,14 @@ const userSchema = new mongoose.Schema({
   isVerified: { type: Boolean, default: false },
   resetPasswordToken: { type: String },
   resetPasswordExpires: { type: Date },
+  newsletterOptIn: { type: Boolean, default: true },
+  allEmailsOptIn: { type: Boolean, default: true },
 }, { timestamps: true });
+
+userSchema.pre('save', function(next) {
+  console.log('Attempting to save user:', this);
+  next();
+});
 
 const User = mongoose.model('User', userSchema);
 

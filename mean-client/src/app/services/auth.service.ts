@@ -6,6 +6,7 @@ import gql from 'graphql-tag';
 import { jwtDecode } from 'jwt-decode';
 import { LoggerService } from './logger.service';
 import { Router } from '@angular/router';
+import { HttpHeaders } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
@@ -199,5 +200,52 @@ export class AuthService {
         return of({ success: false, message: error.message });
       })
     );
+  }
+
+  updateEmailPreferences(newsletterOptIn: boolean, allEmailsOptIn: boolean): Observable<any> {
+    return this.apollo.mutate({
+      mutation: gql`
+        mutation UpdateEmailPreferences($newsletterOptIn: Boolean!, $allEmailsOptIn: Boolean!) {
+          updateEmailPreferences(newsletterOptIn: $newsletterOptIn, allEmailsOptIn: $allEmailsOptIn) {
+            userId
+            newsletterOptIn
+            allEmailsOptIn
+          }
+        }
+      `,
+      variables: {
+        newsletterOptIn,
+        allEmailsOptIn
+      },
+      context: {
+        headers: this.getHeaders()
+      }
+    });
+  }
+
+  getCurrentUser(): Observable<any> {
+    return this.apollo.query({
+      query: gql`
+        query GetCurrentUser {
+          getCurrentUser {
+            id
+            name
+            email
+            newsletterOptIn
+            allEmailsOptIn
+          }
+        }
+      `,
+      context: {
+        headers: this.getHeaders()
+      }
+    }).pipe(
+      map((result: any) => result.data.getCurrentUser)
+    );
+  }
+
+  private getHeaders(): HttpHeaders {
+    const token = localStorage.getItem('token');
+    return new HttpHeaders().set('Authorization', `Bearer ${token}`);
   }
 }
