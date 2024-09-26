@@ -6,6 +6,7 @@ const Order = require('../models/Order');
 const AuthService = require('../services/AuthService');
 const OrderService = require('../services/OrderService');
 const EmailService = require('../services/EmailService');
+const CronService = require('../services/CronService');
 
 const authenticateUser = (context) => {
   const authHeader = context.req.headers.authorization;
@@ -262,6 +263,16 @@ const resolvers = {
       } catch (error) {
         console.error('Error updating email preferences:', error);
         throw new Error(`Failed to update email preferences: ${error.message}`);
+      }
+    },
+    updateNewsletterSchedule: (_, { schedule }, context) => {
+      // You might want to add authentication check here
+      try {
+        CronService.setNewsletterSchedule(schedule);
+        return true;
+      } catch (error) {
+        console.error('Error updating newsletter schedule:', error);
+        return false;
       }
     },
   },

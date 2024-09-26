@@ -71,6 +71,7 @@ const typeDefs = gql`
     resetPassword(resetToken: String!, newPassword: String!): ResetPasswordResponse!
     verifyEmail(userId: String!): VerificationResponse!
     updateEmailPreferences(newsletterOptIn: Boolean!, allEmailsOptIn: Boolean!): EmailPreferencesResponse!
+    updateNewsletterSchedule(schedule: String!): Boolean
   }
 
   type VerificationResponse {

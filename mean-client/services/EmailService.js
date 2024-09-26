@@ -1,6 +1,7 @@
 const nodemailer = require('nodemailer');
 const User = require('../models/User.js');
 const jwt = require('jsonwebtoken');
+const NewsletterService = require('./NewsletterService');
 
 require('dotenv').config();
 
@@ -87,14 +88,26 @@ class EmailService {
 
   static async sendNewsletter() {
     const users = await User.find({ newsletterOptIn: true });
+    const newsletterContent = await NewsletterService.generateNewsletterContent();
+    
     for (const user of users) {
       const mailOptions = {
         from: '"E-commerce App" <noreply@ecommerce.com>',
         to: user.email,
-        subject: 'Weekly Newsletter',
-        html: `<p>Here's your weekly newsletter!</p>`
+        subject: 'E-commerce Newsletter',
+        html: `
+          <h1>Hello ${user.name},</h1>
+          ${newsletterContent}
+          <p>Thank you for subscribing to our newsletter!</p>
+        `
       };
-      await this.transporter.sendMail(mailOptions);
+      
+      try {
+        await this.transporter.sendMail(mailOptions);
+        console.log(`Newsletter sent successfully to ${user.email}`);
+      } catch (error) {
+        console.error(`Error sending newsletter to ${user.email}:`, error);
+      }
     }
   }
 
